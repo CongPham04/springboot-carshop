@@ -46,4 +46,39 @@ public class AccountService {
             }
         }
     }
+    public void UpdateAccount(AccountRequest accountRequest, String accountId) {
+        try{
+            Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+            String oldPassword = account.getPassword();
+            if (accountRequest.getPassword() != null && !accountRequest.getPassword().isBlank()) {
+                account.setPassword(accountRequest.getPassword());
+            } else {
+                account.setPassword(oldPassword);
+            }
+
+            // Cập nhật các field khác từ request sang account
+            accountMapper.updateAccount(accountRequest, account);
+
+            // Lưu lại vào DB
+            accountRepository.save(account);
+
+        }catch (DataIntegrityViolationException e) {
+            String message = e.getMostSpecificCause().getMessage();
+            if (message != null) {
+                if (message.contains("uk_accounts_username")) {
+                    throw new DuplicateKeyException("username đã tồn tại!");
+                } else if (message.contains("uk_accounts_email")) {
+                    throw new DuplicateKeyException("email đã tồn tại!");
+                } else if (message.contains("cannot be null")) {
+                    String field = message.substring(message.indexOf("'") + 1, message.lastIndexOf("'"));
+                    throw new BadRequestException(field + " không được để trống!");
+                } else {
+                    throw new AppException(ErrorCode.BAD_REQUEST);
+                }
+            } else {
+                throw new AppException(ErrorCode.UNKNOWN);
+            }
+        }
+    }
 }

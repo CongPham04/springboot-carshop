@@ -17,6 +17,11 @@ public class UserController {
     @PostMapping("/{accountId}")
     public ResponseEntity<ApiResponse<Void>> createUser(@RequestBody UserRequest userRequest, @PathVariable("accountId") String accountId) {
         userService.CreateUser(userRequest, accountId);
-        return ResponseEntity.ok(ApiResponse.success("Thêm thành công!"));
+        return ResponseEntity.ok(ApiResponse.success("Thêm người dùng thành công!"));
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable("userId") String userId, @RequestBody UserRequest userRequest) {
+        userService.UpdateUser(userRequest, userId);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật người dùng thành công!"));
     }
 }

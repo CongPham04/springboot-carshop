@@ -58,4 +58,31 @@ public class UserService {
         }
 
     }
+
+    public void UpdateUser(UserRequest userRequest, String userId) {
+        try{
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
+            userMapper.updateUser(userRequest, user);
+            userRepository.save(user);
+        }catch (DataIntegrityViolationException e){
+            String message = e.getMostSpecificCause().getMessage(); //lấy message gốc từ DB
+            logger.error("DataIntegrityViolationException caught: {}", message);
+            if(message != null){
+                if(message.contains("uk_users_phone")) {
+                    throw new DuplicateKeyException("Số điện thoại đã tồn tại!");
+                }else if (message.contains("cannot be null")) {
+                    // Lấy ra tên cột bị null từ message (ví dụ: "Column 'password' cannot be null")
+                    String field = message.substring(message.indexOf("'") + 1, message.lastIndexOf("'"));
+                    throw new BadRequestException(field + " không được để trống!");
+                }else{
+                    throw new AppException(ErrorCode.BAD_REQUEST);
+                }
+            }else{
+                throw new AppException(ErrorCode.UNKNOWN);
+            }
+
+        }
+
+    }
 }
