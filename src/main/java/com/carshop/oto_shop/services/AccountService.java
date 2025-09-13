@@ -5,12 +5,18 @@ import com.carshop.oto_shop.common.exceptions.BadRequestException;
 import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.dto.account.AccountRequest;
+import com.carshop.oto_shop.dto.account.AccountResponse;
 import com.carshop.oto_shop.entities.Account;
+import com.carshop.oto_shop.entities.User;
 import com.carshop.oto_shop.mappers.AccountMapper;
 import com.carshop.oto_shop.repositories.AccountRepository;
 import com.carshop.oto_shop.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -80,5 +86,27 @@ public class AccountService {
                 throw new AppException(ErrorCode.UNKNOWN);
             }
         }
+    }
+
+    @Transactional
+    public void DeleteAccount(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+        userRepository.deleteAllByAccountId(accountId);
+        accountRepository.delete(account);
+    }
+
+    public AccountResponse GetAccount(String accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        return accountMapper.toAccountResponse(account);
+    }
+
+    public List<AccountResponse> GetAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream()
+                .map(accountMapper::toAccountResponse)
+                .toList();
     }
 }

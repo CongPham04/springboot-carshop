@@ -4,6 +4,7 @@ import com.carshop.oto_shop.common.exceptions.AppException;
 import com.carshop.oto_shop.common.exceptions.BadRequestException;
 import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
+import com.carshop.oto_shop.dto.user.UserReponse;
 import com.carshop.oto_shop.dto.user.UserRequest;
 import com.carshop.oto_shop.entities.Account;
 import com.carshop.oto_shop.entities.User;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -83,6 +86,24 @@ public class UserService {
             }
 
         }
+    }
 
+    public void DeleteUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
+        userRepository.delete(user);
+    }
+
+    public UserReponse getUser(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserReponse(user);
+    }
+
+    public List<UserReponse> getAllUsers(){
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(userMapper::toUserReponse)
+                .toList();
     }
 }
