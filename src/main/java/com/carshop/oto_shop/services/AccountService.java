@@ -1,0 +1,41 @@
+package com.carshop.oto_shop.services;
+
+import com.carshop.oto_shop.common.exceptions.AppException;
+import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
+import com.carshop.oto_shop.common.exceptions.ErrorCode;
+import com.carshop.oto_shop.dto.account.AccountRequest;
+import com.carshop.oto_shop.entities.Account;
+import com.carshop.oto_shop.mappers.AccountMapper;
+import com.carshop.oto_shop.repositories.AccountRepository;
+import com.carshop.oto_shop.repositories.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AccountService {
+    private final AccountMapper accountMapper;
+    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
+
+    public AccountService(AccountMapper accountMapper, UserRepository userRepository, AccountRepository accountRepository) {
+        this.accountMapper = accountMapper;
+        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+    }
+    public void CreateAccount(AccountRequest accountRequest) {
+        try{
+            Account account = accountMapper.toAccount(accountRequest);
+            accountRepository.save(account);
+        }catch (DataIntegrityViolationException e){
+            String message = e.getMostSpecificCause().getMessage();
+            if(message != null && message.contains("uk_accounts_username")){
+                throw new DuplicateKeyException("username đã tồn tại!");
+            }else if(message != null && message.contains("uk_accounts_email")){
+                throw new DuplicateKeyException("email đã tồn tại!");
+            }else{
+                throw new AppException(ErrorCode.DUPLICATE_KEY);
+            }
+        }
+
+    }
+}
