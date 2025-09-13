@@ -33,6 +33,17 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getErrorCode().getCode(),
+                e.getBrmessage(),
+                e.getErrorCode().getHttpStatus().value()
+        );
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();

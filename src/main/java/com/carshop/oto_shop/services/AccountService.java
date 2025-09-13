@@ -1,6 +1,7 @@
 package com.carshop.oto_shop.services;
 
 import com.carshop.oto_shop.common.exceptions.AppException;
+import com.carshop.oto_shop.common.exceptions.BadRequestException;
 import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.dto.account.AccountRequest;
@@ -26,16 +27,23 @@ public class AccountService {
         try{
             Account account = accountMapper.toAccount(accountRequest);
             accountRepository.save(account);
-        }catch (DataIntegrityViolationException e){
+        }catch (DataIntegrityViolationException e) {
             String message = e.getMostSpecificCause().getMessage();
-            if(message != null && message.contains("uk_accounts_username")){
-                throw new DuplicateKeyException("username đã tồn tại!");
-            }else if(message != null && message.contains("uk_accounts_email")){
-                throw new DuplicateKeyException("email đã tồn tại!");
-            }else{
-                throw new AppException(ErrorCode.DUPLICATE_KEY);
+            if (message != null) {
+                if (message.contains("uk_accounts_username")) {
+                    throw new DuplicateKeyException("username đã tồn tại!");
+                } else if (message.contains("uk_accounts_email")) {
+                    throw new DuplicateKeyException("email đã tồn tại!");
+                }else if (message.contains("cannot be null")) {
+                    // Lấy ra tên cột bị null từ message (ví dụ: "Column 'password' cannot be null")
+                    String field = message.substring(message.indexOf("'") + 1, message.lastIndexOf("'"));
+                    throw new BadRequestException(field + " không được để trống!");
+                }else{
+                    throw new AppException(ErrorCode.BAD_REQUEST);
+                }
+            } else {
+                throw new AppException(ErrorCode.UNKNOWN);
             }
         }
-
     }
 }

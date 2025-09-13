@@ -1,6 +1,7 @@
 package com.carshop.oto_shop.services;
 
 import com.carshop.oto_shop.common.exceptions.AppException;
+import com.carshop.oto_shop.common.exceptions.BadRequestException;
 import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.dto.user.UserRequest;
@@ -38,13 +39,22 @@ public class UserService {
         }catch (DataIntegrityViolationException e){
             String message = e.getMostSpecificCause().getMessage(); //lấy message gốc từ DB
             logger.error("DataIntegrityViolationException caught: {}", message);
-            if(message != null && message.contains("uk_users_phone")) {
-                throw new DuplicateKeyException("Số điện thoại đã tồn tại!");
-            }else if(message != null && message.contains(accountId)){
-                throw new DuplicateKeyException("Người dùng cho tài khoản này đã tồn tại!");
-            }else {
-                throw new AppException(ErrorCode.DUPLICATE_KEY);
+            if(message != null){
+                if(message.contains("uk_users_phone")) {
+                    throw new DuplicateKeyException("Số điện thoại đã tồn tại!");
+                }else if(message.contains(accountId)){
+                    throw new DuplicateKeyException("Người dùng cho tài khoản này đã tồn tại!");
+                }else if (message.contains("cannot be null")) {
+                    // Lấy ra tên cột bị null từ message (ví dụ: "Column 'password' cannot be null")
+                    String field = message.substring(message.indexOf("'") + 1, message.lastIndexOf("'"));
+                    throw new BadRequestException(field + " không được để trống!");
+                }else{
+                    throw new AppException(ErrorCode.BAD_REQUEST);
+                }
+            }else{
+                throw new AppException(ErrorCode.UNKNOWN);
             }
+
         }
 
     }
