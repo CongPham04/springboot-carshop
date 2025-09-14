@@ -5,9 +5,13 @@ import com.carshop.oto_shop.enums.Role;
 
 public class AccountRequest {
     private String username;
+
     private String email;
+
     private String password;
+
     private Role role;
+
     private AccountStatus status;
 
     public String getUsername() {

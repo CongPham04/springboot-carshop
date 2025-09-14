@@ -2,6 +2,7 @@ package com.carshop.oto_shop.common.exceptions;
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -40,6 +41,17 @@ public class GlobalExceptionHandler {
                 e.getBrmessage(),
                 e.getErrorCode().getHttpStatus().value()
         );
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(ErrorCode.METHOD_NOT_ALLOWED.getMessage());
+        errorResponse.setStatus(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus().value());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setErrorCode(ErrorCode.METHOD_NOT_ALLOWED.getCode());
         return ResponseEntity
                 .status(errorResponse.getStatus())
                 .body(errorResponse);

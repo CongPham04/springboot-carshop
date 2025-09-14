@@ -44,6 +44,6 @@ public class AccountController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<AccountResponse>>> getAllAccounts() {
         List<AccountResponse> dataAccounts = accountService.GetAllAccounts();
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin các tài khoản thành công!", dataAccounts));
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách tài khoản thành công!", dataAccounts));
     }
 }

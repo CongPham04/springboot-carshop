@@ -5,8 +5,11 @@ import com.carshop.oto_shop.enums.Role;
 
 public class AccountResponse {
     private String username;
+
     private String email;
+
     private Role role;
+
     private AccountStatus status;
 
     public AccountResponse() {

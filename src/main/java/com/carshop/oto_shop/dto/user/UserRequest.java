@@ -6,9 +6,13 @@ import java.time.LocalDate;
 
 public class UserRequest {
     private String  fullName;
+
     private LocalDate dob;
+
     private Gender gender;
+
     private String phone;
+
     private String address;
 
     public String getFullName() {

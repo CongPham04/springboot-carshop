@@ -44,6 +44,6 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserReponse>>> getAllUsers() {
         List<UserReponse> dataUsers = userService.getAllUsers();
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin của các người dùng thành công!", dataUsers));
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công!", dataUsers));
     }
 }

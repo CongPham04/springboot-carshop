@@ -6,10 +6,15 @@ import java.time.LocalDate;
 
 public class UserReponse {
     private String userId;
+
     private String  fullName;
+
     private LocalDate dob;
+
     private Gender gender;
+
     private String phone;
+
     private String address;
 
     public String getUserId() {
