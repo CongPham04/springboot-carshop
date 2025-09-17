@@ -2,10 +2,12 @@ package com.carshop.oto_shop.common.exceptions;
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
 
@@ -52,6 +54,28 @@ public class GlobalExceptionHandler {
         errorResponse.setStatus(ErrorCode.METHOD_NOT_ALLOWED.getHttpStatus().value());
         errorResponse.setTimestamp(LocalDateTime.now());
         errorResponse.setErrorCode(ErrorCode.METHOD_NOT_ALLOWED.getCode());
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
+    @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getHttpStatus().value());
+        errorResponse.setMessage(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setErrorCode(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getCode());
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(ErrorCode.FILE_UPLOAD_ERROR.getCode());
+        errorResponse.setMessage(ErrorCode.FILE_UPLOAD_ERROR.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(ErrorCode.FILE_SIZE_EXCEEDED.getHttpStatus().value());
         return ResponseEntity
                 .status(errorResponse.getStatus())
                 .body(errorResponse);

@@ -28,6 +28,7 @@ public class CarCategory {
             Random random = new Random();
             this.categoryId = 100000L + random.nextLong(900000);
         }
+
     }
 
     public CarCategory() {
