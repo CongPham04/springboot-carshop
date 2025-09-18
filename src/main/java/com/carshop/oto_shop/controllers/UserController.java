@@ -37,8 +37,8 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserReponse>> getUser(@PathVariable("userId") String userId) {
-        UserReponse dataUser = userService.getUser(userId);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công!",dataUser));
+        UserReponse dataUsers = userService.getUser(userId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công!",dataUsers));
     }
 
     @GetMapping

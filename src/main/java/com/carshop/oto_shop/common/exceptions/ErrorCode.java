@@ -7,6 +7,7 @@ public enum ErrorCode {
     USER_NOT_FOUND("USER_NOT_FOUND","Người dùng không tồn tại!", HttpStatus.NOT_FOUND),
     CARCATEGORY_NOT_FOUND("CARCATEGORY_NOT_FOUND", "Danh mục không còn tồn tại!", HttpStatus.NOT_FOUND),
     CAR_NOT_FOUND("CARCATE_NOT_FOUND", "Sản phẩm không còn tồn tại!", HttpStatus.NOT_FOUND),
+    FILE_NOT_FOUND("FILE_NOT_FOUND","File không tồn tại!", HttpStatus.NOT_FOUND),
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "Lỗi máy chủ!", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_UPLOAD_ERROR("FILE_UPLOAD_ERROR", "Lỗi khi upload file!", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", "Kích thước vượt quá giới hạn cho phép!", HttpStatus.PAYLOAD_TOO_LARGE),

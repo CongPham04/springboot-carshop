@@ -33,12 +33,12 @@ public class CarCategoryController {
     }
     @GetMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CarCategoryResponse>> getCarCategory(@PathVariable Long categoryId){
-        CarCategoryResponse dataCarCategoryResponse = carCategoryService.getCarCategory(categoryId);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin danh mục thành công!", dataCarCategoryResponse));
+        CarCategoryResponse dataCarCategoryResponses = carCategoryService.getCarCategory(categoryId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin danh mục thành công!", dataCarCategoryResponses));
     }
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarCategoryResponse>>> getAllCarCategory(){
-        List<CarCategoryResponse> dataCarCategoryResponse = carCategoryService.getAllCarCategory();
-        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách danh mục thành công!", dataCarCategoryResponse));
+        List<CarCategoryResponse> dataCarCategoryResponses = carCategoryService.getAllCarCategory();
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách danh mục thành công!", dataCarCategoryResponses));
     }
 }

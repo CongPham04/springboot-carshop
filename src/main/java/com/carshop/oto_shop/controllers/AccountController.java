@@ -37,8 +37,8 @@ public class AccountController {
 
     @GetMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountResponse>> getAccount(@PathVariable String accountId) {
-        AccountResponse dataAccount = accountService.GetAccount(accountId);
-        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công!", dataAccount));
+        AccountResponse dataAccounts = accountService.GetAccount(accountId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công!", dataAccounts));
     }
 
     @GetMapping

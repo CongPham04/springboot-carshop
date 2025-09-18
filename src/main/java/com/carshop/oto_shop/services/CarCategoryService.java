@@ -6,18 +6,25 @@ import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.dto.carcategory.CarCategoryRequest;
 import com.carshop.oto_shop.dto.carcategory.CarCategoryResponse;
+import com.carshop.oto_shop.entities.Car;
 import com.carshop.oto_shop.entities.CarCategory;
 import com.carshop.oto_shop.mappers.CarCategoryMapper;
 import com.carshop.oto_shop.repositories.CarCategoryRepository;
 import com.carshop.oto_shop.repositories.CarRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
 public class CarCategoryService {
+    private static final Logger logger = LoggerFactory.getLogger(CarService.class);
     private final CarCategoryRepository carCategoryRepository;
     private final CarCategoryMapper carCategoryMapper;
     private final CarRepository carRepository;
@@ -70,11 +77,44 @@ public class CarCategoryService {
         }
     }
 
+    private void deleteImageFile(String imageUrl) {
+        if (imageUrl == null)
+            return;
+        try {
+            String fileName = Paths.get(imageUrl).getFileName().toString();
+            Path filePath = Paths.get(CarService.UPLOAD_DIR).resolve(fileName).normalize();
+            File file = filePath.toFile();
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (deleted) {
+                    logger.info("Da xoa file anh: " + filePath);
+                } else {
+                    logger.warn("Khong the xoa anh: " + filePath);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Loi khi xoa anh: " + e.getMessage());
+        }
+    }
+
     @Transactional
     public void deleteCarCategory(Long categoryId) {
         CarCategory carCategory = carCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CARCATEGORY_NOT_FOUND));
-        carRepository.deleteByCategoryId(categoryId);
+        // Lấy tất cả Car thuộc category này
+        List<Car> cars = carRepository.findAllByCarCategory_CategoryId(categoryId);
+        logger.info("So luong car tim thay: " + cars.size());
+
+        if (!cars.isEmpty()) {
+            for (Car car : cars) {
+                logger.info("Dang xu ly carId=" + car.getCarId() + ", imageUrl=" + car.getImageUrl());
+                if (car.getImageUrl() != null && !car.getImageUrl().isBlank()) {
+                    deleteImageFile(car.getImageUrl());
+                }
+            }
+            // Xoá toàn bộ car thuộc categoryId
+            carRepository.deleteAll(cars);
+        }
         carCategoryRepository.delete(carCategory);
     }
 
