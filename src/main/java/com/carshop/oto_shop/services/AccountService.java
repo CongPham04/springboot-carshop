@@ -13,6 +13,7 @@ import com.carshop.oto_shop.repositories.AccountRepository;
 import com.carshop.oto_shop.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +23,18 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AccountService(AccountMapper accountMapper, UserRepository userRepository, AccountRepository accountRepository) {
+    public AccountService(AccountMapper accountMapper, UserRepository userRepository, AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         this.accountMapper = accountMapper;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     public void CreateAccount(AccountRequest accountRequest) {
         try{
             Account account = accountMapper.toAccount(accountRequest);
+            account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
             accountRepository.save(account);
         }catch (DataIntegrityViolationException e) {
             String message = e.getMostSpecificCause().getMessage();
@@ -57,7 +61,7 @@ public class AccountService {
                     .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_FOUND));
             String oldPassword = account.getPassword();
             if (accountRequest.getPassword() != null && !accountRequest.getPassword().isBlank()) {
-                account.setPassword(accountRequest.getPassword());
+                account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
             } else {
                 account.setPassword(oldPassword);
             }

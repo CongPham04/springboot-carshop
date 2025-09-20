@@ -103,11 +103,8 @@ public class CarCategoryService {
                 .orElseThrow(() -> new AppException(ErrorCode.CARCATEGORY_NOT_FOUND));
         // Lấy tất cả Car thuộc category này
         List<Car> cars = carRepository.findAllByCarCategory_CategoryId(categoryId);
-        logger.info("So luong car tim thay: " + cars.size());
-
         if (!cars.isEmpty()) {
             for (Car car : cars) {
-                logger.info("Dang xu ly carId=" + car.getCarId() + ", imageUrl=" + car.getImageUrl());
                 if (car.getImageUrl() != null && !car.getImageUrl().isBlank()) {
                     deleteImageFile(car.getImageUrl());
                 }
