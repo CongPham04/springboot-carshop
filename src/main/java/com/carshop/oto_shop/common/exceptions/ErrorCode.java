@@ -15,7 +15,8 @@ public enum ErrorCode {
     DUPLICATE_KEY("DUPLICATE_KEY","Trùng lặp dữ liệu!",HttpStatus.CONFLICT),
     UNKNOWN("UNKNOWN_ERROR", "Lỗi không xác định!", HttpStatus.INTERNAL_SERVER_ERROR),
     BAD_REQUEST("BAD_REQUEST", "Dữ liệu đầu vào không hợp lệ!", HttpStatus.BAD_REQUEST),
-    METHOD_NOT_ALLOWED("METHOD_NOT_ALLOWED", "Phương thức HTTP không được hỗ trợ!", HttpStatus.METHOD_NOT_ALLOWED);
+    METHOD_NOT_ALLOWED("METHOD_NOT_ALLOWED", "Phương thức HTTP không được hỗ trợ!", HttpStatus.METHOD_NOT_ALLOWED),
+    INVALID_OR_EXPIRED_REFRESH_TOKEN("INVALID_OR_EXPIRED_REFRESH_TOKEN", "Refresh token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),;
     private final String code;
     private final String message;
     private final HttpStatus httpStatus;
