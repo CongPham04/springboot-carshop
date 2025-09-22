@@ -16,7 +16,8 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("{\"code\":401, \"message\":\"Unauthorized - token bị thiếu hoặc không hợp lệ\"}");
+        response.getWriter().write("{\"code\":401, \"message\":\"Unauthorized - token bị thiếu hoặc không hợp lệ!\"}");
     }
 }

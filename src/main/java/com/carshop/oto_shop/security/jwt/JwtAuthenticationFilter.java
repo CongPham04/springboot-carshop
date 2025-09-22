@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -35,6 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
+            if(isBypassToken(request)){
+                filterChain.doFilter(request, response);
+                return;
+            }
             // Lấy token từ header Authorization
             String token = JwtUtils.getTokenFromHeader(request);
 
@@ -65,5 +72,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Tiếp tục chain
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isBypassToken(HttpServletRequest request) {
+        final List<Pair<String, String>> bypassTokens = Arrays.asList(
+                Pair.of("/api/cars", "GET"),
+                Pair.of("/api/car-categories", "GET"),
+                Pair.of("/api/auth/register", "POST"),
+                Pair.of("/api/auth/login", "POST")
+        );
+
+        String requestPath = request.getServletPath();
+        String requestMethod = request.getMethod();
+
+        return bypassTokens.stream()
+                .anyMatch(p -> requestPath.startsWith(p.getLeft()) && requestMethod.equalsIgnoreCase(p.getRight()));
     }
 }

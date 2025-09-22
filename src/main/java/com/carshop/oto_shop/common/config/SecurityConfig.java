@@ -1,11 +1,13 @@
 package com.carshop.oto_shop.common.config;
 
+import com.carshop.oto_shop.enums.Role;
 import com.carshop.oto_shop.security.handers.AccessDeniedHandlerImpl;
 import com.carshop.oto_shop.security.handers.AuthEntryPointJwt;
 import com.carshop.oto_shop.security.jwt.JwtAuthenticationFilter;
 import com.carshop.oto_shop.security.services.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -14,6 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+
 
 @Configuration
 public class SecurityConfig {
@@ -35,22 +39,37 @@ public class SecurityConfig {
         this.accessDeniedHandler = accessDeniedHandler;
     }
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // tắt CSRF (dành cho Postman test API)
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authEntryPointJwt)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/cars/**", "/api/car-categories").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/cars/**","/api/car-categories/**","/api/accounts/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/cars/**", "/api/car-categories/**", "/api/accounts/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/cars/**","/api/car-categories/**", "/api/accounts/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

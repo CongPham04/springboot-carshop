@@ -15,7 +15,8 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.getWriter().write("{\"code\":403, \"message\":\"Forbidden - bạn không có quyền yêu cầu\"}");
+        response.getWriter().write("{\"code\":403, \"message\":\"Forbidden - bạn không có quyền yêu cầu!\"}");
     }
 }

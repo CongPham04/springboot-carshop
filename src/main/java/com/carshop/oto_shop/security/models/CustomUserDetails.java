@@ -60,4 +60,8 @@ public class CustomUserDetails implements UserDetails {
     public String getRole() {
         return account.getRole().name();
     }
+
+    public AccountStatus getStatus() {
+        return account.getStatus();
+    }
 }

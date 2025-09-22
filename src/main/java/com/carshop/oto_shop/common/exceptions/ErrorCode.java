@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
     ACCOUNT_NOT_FOUND("ACCOUNT_NOT_FOUND", "Tài khoản không tồn tại!", HttpStatus.NOT_FOUND),
+    ACCOUNT_BANNED("ACCOUNT_BANNED", "Tài khoản của bạn đã bị cấm!", HttpStatus.FORBIDDEN),
+    ACCOUNT_INACTIVE("ACCOUNT_INACTIVE", "Tài khoản của bạn chưa được kích hoạt! Liên hệ ngay đến Admin để được kích hoạt.", HttpStatus.FORBIDDEN),
     USER_NOT_FOUND("USER_NOT_FOUND","Người dùng không tồn tại!", HttpStatus.NOT_FOUND),
     CARCATEGORY_NOT_FOUND("CARCATEGORY_NOT_FOUND", "Danh mục không còn tồn tại!", HttpStatus.NOT_FOUND),
     CAR_NOT_FOUND("CARCATE_NOT_FOUND", "Sản phẩm không còn tồn tại!", HttpStatus.NOT_FOUND),

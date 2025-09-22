@@ -2,6 +2,8 @@ package com.carshop.oto_shop.common.exceptions;
 
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,6 +27,7 @@ public class GlobalExceptionHandler {
                     .status(errorCode.getHttpStatus().value())
                     .body(errorResponse);
     }
+
     @ExceptionHandler(value = DuplicateKeyException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateKeyException(DuplicateKeyException e) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -36,6 +39,7 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+
     @ExceptionHandler(value = BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -47,6 +51,7 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -58,6 +63,7 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+
     @ExceptionHandler(value = HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -69,6 +75,7 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+
     @ExceptionHandler(value = MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -80,6 +87,31 @@ public class GlobalExceptionHandler {
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
     }
+
+    @ExceptionHandler(value = LockedException.class)
+    public ResponseEntity<ErrorResponse> handleLockedException(LockedException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(ErrorCode.ACCOUNT_BANNED.getCode());
+        errorResponse.setMessage(ErrorCode.ACCOUNT_BANNED.getMessage());
+        errorResponse.setStatus(ErrorCode.ACCOUNT_BANNED.getHttpStatus().value());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(value = DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabledException(DisabledException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(ErrorCode.ACCOUNT_INACTIVE.getCode());
+        errorResponse.setMessage(ErrorCode.ACCOUNT_INACTIVE.getMessage());
+        errorResponse.setStatus(ErrorCode.ACCOUNT_INACTIVE.getHttpStatus().value());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity
+                .status(errorResponse.getStatus())
+                .body(errorResponse);
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
