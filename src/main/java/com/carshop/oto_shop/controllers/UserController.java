@@ -1,7 +1,7 @@
 package com.carshop.oto_shop.controllers;
 
 import com.carshop.oto_shop.common.response.ApiResponse;
-import com.carshop.oto_shop.dto.user.UserReponse;
+import com.carshop.oto_shop.dto.user.UserResponse;
 import com.carshop.oto_shop.dto.user.UserRequest;
 import com.carshop.oto_shop.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,15 +43,15 @@ public class UserController {
 
     @Operation(summary = "Get user detail", description = "API get user detail")
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserReponse>> getUser(@PathVariable("userId") String userId) {
-        UserReponse dataUsers = userService.getUser(userId);
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable("userId") String userId) {
+        UserResponse dataUsers = userService.getUser(userId);
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công!",dataUsers));
     }
 
     @Operation(summary = "Get all user", description = "API get all user")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<UserReponse>>> getAllUsers() {
-        List<UserReponse> dataUsers = userService.getAllUsers();
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        List<UserResponse> dataUsers = userService.getAllUsers();
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công!", dataUsers));
     }
 }

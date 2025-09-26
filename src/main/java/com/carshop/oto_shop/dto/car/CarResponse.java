@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 public class CarResponse {
     private Long carId;
 
-    private String brand;
+    private Long brandId;
+
+    private Long categoryId;
 
     private String model;
 
@@ -34,12 +36,20 @@ public class CarResponse {
         this.carId = carId;
     }
 
-    public String getBrand() {
-        return brand;
+    public Long getBrandId() {
+        return brandId;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getModel() {

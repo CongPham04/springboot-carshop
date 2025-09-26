@@ -4,7 +4,7 @@ import com.carshop.oto_shop.common.exceptions.AppException;
 import com.carshop.oto_shop.common.exceptions.BadRequestException;
 import com.carshop.oto_shop.common.exceptions.DuplicateKeyException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
-import com.carshop.oto_shop.dto.user.UserReponse;
+import com.carshop.oto_shop.dto.user.UserResponse;
 import com.carshop.oto_shop.dto.user.UserRequest;
 import com.carshop.oto_shop.entities.Account;
 import com.carshop.oto_shop.entities.User;
@@ -94,16 +94,16 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public UserReponse getUser(String userId) {
+    public UserResponse getUser(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserReponse(user);
+        return userMapper.toUserResponse(user);
     }
 
-    public List<UserReponse> getAllUsers(){
+    public List<UserResponse> getAllUsers(){
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(userMapper::toUserReponse)
+                .map(userMapper::toUserResponse)
                 .toList();
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/car-categories")
-@Tag(name = "CarCatrgoryController")
+@Tag(name = "CarCategoryController")
 public class CarCategoryController {
     private final CarCategoryService carCategoryService;
     public CarCategoryController(CarCategoryService carCategoryService) {

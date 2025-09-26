@@ -4,7 +4,7 @@ import com.carshop.oto_shop.enums.Gender;
 
 import java.time.LocalDate;
 
-public class UserReponse {
+public class UserResponse {
     private String userId;
 
     private String  fullName;

@@ -7,7 +7,6 @@ import com.carshop.oto_shop.dto.auth.JwtResponse;
 import com.carshop.oto_shop.dto.auth.LoginRequest;
 import com.carshop.oto_shop.dto.auth.SignupRequest;
 import com.carshop.oto_shop.entities.Account;
-import com.carshop.oto_shop.enums.AccountStatus;
 import com.carshop.oto_shop.repositories.AccountRepository;
 import com.carshop.oto_shop.security.jwt.JwtTokenProvider;
 import com.carshop.oto_shop.security.models.CustomUserDetails;

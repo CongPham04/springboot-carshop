@@ -5,15 +5,13 @@ public class CarCategoryResponse {
 
     private String categoryName;
 
-    private String categoryDescription;
-
     public CarCategoryResponse() {
     }
 
-    public CarCategoryResponse(Long categoryId, String categoryName, String categoryDescription) {
+    public CarCategoryResponse(Long categoryId, String categoryName) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
-        this.categoryDescription = categoryDescription;
+
     }
 
     public Long getCategoryId() {
@@ -32,11 +30,4 @@ public class CarCategoryResponse {
         this.categoryName = categoryName;
     }
 
-    public String getCategoryDescription() {
-        return categoryDescription;
-    }
-
-    public void setCategoryDescription(String categoryDescription) {
-        this.categoryDescription = categoryDescription;
-    }
 }

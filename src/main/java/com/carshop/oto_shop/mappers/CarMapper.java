@@ -3,6 +3,8 @@ package com.carshop.oto_shop.mappers;
 import com.carshop.oto_shop.dto.car.CarRequest;
 import com.carshop.oto_shop.dto.car.CarResponse;
 import com.carshop.oto_shop.entities.Car;
+import com.carshop.oto_shop.entities.CarBrand;
+import com.carshop.oto_shop.entities.CarCategory;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
@@ -16,4 +18,5 @@ public interface CarMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "imageUrl", ignore = true)    // không overwrite imageUrl
     void updateCarRequest(CarRequest carRequest, @MappingTarget Car car);
+
 }

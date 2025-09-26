@@ -20,8 +20,10 @@ public class Car {
             foreignKey = @ForeignKey(name = "fk_cars_category"))
     private CarCategory carCategory;
 
-    @Column(name = "brand", nullable = false, length = 50)
-    private String brand;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_cars_brand"))
+    private CarBrand carBrand;
 
     @Column(name = "model", nullable = false, length = 50)
     private String model;
@@ -75,12 +77,12 @@ public class Car {
         this.carCategory = carCategory;
     }
 
-    public String getBrand() {
-        return brand;
+    public CarBrand getCarBrand() {
+        return carBrand;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setCarBrand(CarBrand carBrand) {
+        this.carBrand = carBrand;
     }
 
     public String getModel() {

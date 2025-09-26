@@ -19,16 +19,12 @@ public class CarCategory {
     @Column(name = "category_name", nullable = false, unique = true, length = 100)
     private String categoryName;
 
-    @Column(name = "category_description")
-    private String categoryDescription;
-
     @PrePersist
     public void generateId(){
         if(this.categoryId == null){
             Random random = new Random();
-            this.categoryId = 100000L + random.nextLong(900000);
+            this.categoryId = 10000000L + random.nextLong(90000000);
         }
-
     }
 
     public CarCategory() {
@@ -50,11 +46,5 @@ public class CarCategory {
         this.categoryName = categoryName;
     }
 
-    public String getCategoryDescription() {
-        return categoryDescription;
-    }
 
-    public void setCategoryDescription(String categoryDescription) {
-        this.categoryDescription = categoryDescription;
-    }
 }

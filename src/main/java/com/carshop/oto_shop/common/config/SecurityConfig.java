@@ -59,13 +59,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
-                                "/api/cars/**", "/api/car-categories").permitAll()
+                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands/**", "/api/car-details/**").permitAll()
                         .requestMatchers(HttpMethod.POST,
-                                "/api/cars/**","/api/car-categories/**","/api/accounts/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.PUT,
-                                "/api/cars/**", "/api/car-categories/**", "/api/accounts/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE,
-                                "/api/cars/**","/api/car-categories/**", "/api/accounts/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.POST,
                                 "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.PUT,

@@ -32,9 +32,9 @@ public class CarController {
     }
 
     @Operation(summary = "Add car", description = "API create new car")
-    @PostMapping(value = "/{categoryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Void>> createCar(@PathVariable("categoryId") Long categoryId, @ModelAttribute CarRequest carRequest ) {
-        carService.createCar(carRequest, categoryId);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Void>> createCar(@ModelAttribute CarRequest carRequest ) {
+        carService.createCar(carRequest);
         return ResponseEntity.ok(ApiResponse.success("Thêm sản phẩm thành công!"));
     }
 
@@ -72,7 +72,6 @@ public class CarController {
                 if (contentType == null) {
                     contentType = "application/octet-stream";
                 }
-
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         .body(resource);
@@ -86,10 +85,25 @@ public class CarController {
         }
     }
 
+    @Operation(summary = "Get cars by brand", description = "API get all cars by brandId")
+    @GetMapping("/brand/{brandId}")
+    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByBrand(@PathVariable("brandId") Long brandId) {
+        List<CarResponse> dataCars = carService.getCarsByBrand(brandId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách xe theo brand thành công!", dataCars));
+    }
+
+    @Operation(summary = "Get cars by category", description = "API get all cars by categoryId")
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByCategory(@PathVariable("categoryId") Long categoryId) {
+        List<CarResponse> dataCars = carService.getCarsByCategory(categoryId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách xe theo category thành công!", dataCars));
+    }
+
     @Operation(summary = "Get all car", description = "API get all car")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarResponse>>> getAllCars() {
         List<CarResponse> dataCars = carService.getAllCars();
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách sản phẩm thành công!", dataCars));
     }
+
 }

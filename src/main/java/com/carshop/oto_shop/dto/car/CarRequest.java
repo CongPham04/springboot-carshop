@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 
 public class CarRequest {
-    private String brand;
+    private Long brandId;
+
+    private Long categoryId;
 
     private String model;
 
@@ -22,12 +24,20 @@ public class CarRequest {
 
     private MultipartFile imageFile;
 
-    public String getBrand() {
-        return brand;
+    public Long getBrandId() {
+        return brandId;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getModel() {
