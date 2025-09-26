@@ -48,6 +48,14 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPointJwt)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép truy cập swagger mà không cần login
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,

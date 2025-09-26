@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 
 public class CarResponse {
+    private Long carId;
+
     private String brand;
 
     private String model;
@@ -23,6 +25,14 @@ public class CarResponse {
     private String imageUrl;
 
     public CarResponse() {}
+
+    public Long getCarId() {
+        return carId;
+    }
+
+    public void setCarId(Long carId) {
+        this.carId = carId;
+    }
 
     public String getBrand() {
         return brand;

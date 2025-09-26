@@ -6,6 +6,8 @@ import com.carshop.oto_shop.common.response.ApiResponse;
 import com.carshop.oto_shop.dto.car.CarRequest;
 import com.carshop.oto_shop.dto.car.CarResponse;
 import com.carshop.oto_shop.services.CarService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cars")
+@Tag(name = "CarController")
 public class CarController {
     private final CarService carService;
 
@@ -28,30 +31,35 @@ public class CarController {
         this.carService = carService;
     }
 
+    @Operation(summary = "Add car", description = "API create new car")
     @PostMapping(value = "/{categoryId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> createCar(@PathVariable("categoryId") Long categoryId, @ModelAttribute CarRequest carRequest ) {
         carService.createCar(carRequest, categoryId);
         return ResponseEntity.ok(ApiResponse.success("Thêm sản phẩm thành công!"));
     }
 
+    @Operation(summary = "Update car", description = "API update car")
     @PutMapping(value = "/{carId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> updateCar(@PathVariable("carId") Long carId, @ModelAttribute CarRequest carRequest ) {
         carService.updateCar(carRequest,carId);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật sản phẩm thành công!"));
     }
 
+    @Operation(summary = "Delete Car", description = "API delete car")
     @DeleteMapping(value = "/{carId}")
     public ResponseEntity<ApiResponse<Void>> deleteCar(@PathVariable("carId") Long carId) {
         carService.deleteCar(carId);
         return ResponseEntity.ok(ApiResponse.success("Xoá sản phẩm thành công!"));
     }
 
+    @Operation(summary = "Get car detail", description = "API get car detail")
     @GetMapping(value = "/{carId}")
     public ResponseEntity<ApiResponse<CarResponse>> getCar(@PathVariable("carId") Long carId) {
         CarResponse dataCars = carService.getCar(carId);
         return ResponseEntity.ok(ApiResponse.success("Lấy ra sản phẩm thành công!", dataCars));
     }
 
+    @Operation(summary = "Get image", description = "API get image")
     @GetMapping("/image/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         try {
@@ -78,6 +86,7 @@ public class CarController {
         }
     }
 
+    @Operation(summary = "Get all car", description = "API get all car")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarResponse>>> getAllCars() {
         List<CarResponse> dataCars = carService.getAllCars();
