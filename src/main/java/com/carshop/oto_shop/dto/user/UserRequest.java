@@ -1,6 +1,7 @@
 package com.carshop.oto_shop.dto.user;
 
 import com.carshop.oto_shop.enums.Gender;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -14,6 +15,8 @@ public class UserRequest {
     private String phone;
 
     private String address;
+
+    private MultipartFile avatarFile;
 
     public String getFullName() {
         return fullName;
@@ -53,5 +56,13 @@ public class UserRequest {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public MultipartFile getAvatarFile() {
+        return avatarFile;
+    }
+
+    public void setAvatarFile(MultipartFile avatarFile) {
+        this.avatarFile = avatarFile;
     }
 }

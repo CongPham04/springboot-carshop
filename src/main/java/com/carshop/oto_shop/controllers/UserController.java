@@ -1,14 +1,25 @@
 package com.carshop.oto_shop.controllers;
 
+import com.carshop.oto_shop.common.exceptions.AppException;
+import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.common.response.ApiResponse;
 import com.carshop.oto_shop.dto.user.UserResponse;
 import com.carshop.oto_shop.dto.user.UserRequest;
+import com.carshop.oto_shop.services.CarService;
 import com.carshop.oto_shop.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -21,8 +32,8 @@ public class UserController {
     }
 
     @Operation(summary = "Add user", description = "API create new user")
-    @PostMapping("/{accountId}")
-    public ResponseEntity<ApiResponse<Void>> createUser(@RequestBody UserRequest userRequest, @PathVariable("accountId") String accountId) {
+    @PostMapping(value = "/{accountId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Void>> createUser(@ModelAttribute UserRequest userRequest, @PathVariable("accountId") String accountId) {
         userService.CreateUser(userRequest, accountId);
         return ResponseEntity.ok(ApiResponse.success("Thêm người dùng thành công!"));
     }
@@ -46,6 +57,32 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable("userId") String userId) {
         UserResponse dataUsers = userService.getUser(userId);
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công!",dataUsers));
+    }
+
+    @Operation(summary = "Get image", description = "API get image")
+    @GetMapping("/avatar/image/{filename:.+}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(UserService.UPLOAD_DIR).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() && resource.isReadable()) {
+                // Xác định Content-Type của file
+                String contentType = Files.probeContentType(filePath);
+                if (contentType == null) {
+                    contentType = "application/octet-stream";
+                }
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                throw new AppException(ErrorCode.FILE_NOT_FOUND);
+            }
+        } catch (MalformedURLException e) {
+            throw new AppException(ErrorCode.FILE_NOT_FOUND);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
+        }
     }
 
     @Operation(summary = "Get all user", description = "API get all user")

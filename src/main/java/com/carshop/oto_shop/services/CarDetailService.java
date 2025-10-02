@@ -21,6 +21,7 @@ public class CarDetailService {
     private final CarDetailMapper carDetailMapper;
     private final CarDetailRepository carDetailRepository;
     private final CarRepository carRepository;
+    private CarDetailRequest CarDetailRepository;
 
     public CarDetailService(CarDetailMapper carDetailMapper, CarDetailRepository carDetailRepository, CarRepository carRepository) {
         this.carDetailMapper = carDetailMapper;
@@ -38,7 +39,7 @@ public class CarDetailService {
         }catch(DataIntegrityViolationException e){
             String message = e.getMostSpecificCause().getMessage();
             if(message != null){
-                if(message.contains("uk_car_details_car_id")){
+                if(message.contains("Duplicate entry")){
                     throw new DuplicateKeyException("Chi tiết xe cho id này đã tồn tại!");
                 }else if (message.contains("cannot be null")) {
                     // Lấy ra tên cột bị null từ message (ví dụ: "Column 'password' cannot be null")

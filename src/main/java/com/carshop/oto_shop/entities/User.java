@@ -40,6 +40,9 @@ public class User {
     @Column(name = "address", length = 255)
     private String address;
 
+    @Column(name = "avatar_url", length = 255)
+    private String avatarUrl;
+
     public User(){
 
     }
@@ -98,5 +101,13 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

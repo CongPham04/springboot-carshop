@@ -17,6 +17,8 @@ public class UserResponse {
 
     private String address;
 
+    private String avatarUrl;
+
     public String getUserId() {
         return userId;
     }
@@ -63,5 +65,13 @@ public class UserResponse {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

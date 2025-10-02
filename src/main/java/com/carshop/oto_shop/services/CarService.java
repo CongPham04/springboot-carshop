@@ -36,7 +36,7 @@ public class CarService {
     private final CarCategoryRepository carCategoryRepository;
     private final CarBrandRepository carBrandRepository;
     private final CarDetailRepository carDetailRepository;
-    public static final String UPLOAD_DIR = "uploads/";
+    public static final String UPLOAD_DIR = "uploads/cars/";
     private static final String BASE_IMAGE_URL = "http://localhost:8080/carshop/api/cars/image/";
 
     public CarService(CarRepository carRepository, CarMapper carMapper , CarCategoryRepository carCategoryRepository, CarBrandRepository carBrandRepository, CarDetailRepository carDetailRepository) {
@@ -138,7 +138,7 @@ public class CarService {
             // Lưu file vào thư mục
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
             // URL ảnh
-            return "/uploads/" + fileName;
+            return UPLOAD_DIR + fileName;
         }catch (IOException e){
             throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
         }
