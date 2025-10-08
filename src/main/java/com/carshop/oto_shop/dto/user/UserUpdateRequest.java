@@ -3,33 +3,53 @@ package com.carshop.oto_shop.dto.user;
 import com.carshop.oto_shop.enums.AccountStatus;
 import com.carshop.oto_shop.enums.Gender;
 import com.carshop.oto_shop.enums.Role;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
-public class UserResponse {
-    // User information
-    private String userId;
-    private String fullName;
-    private LocalDate dob;
-    private Gender gender;
-    private String phone;
-    private String address;
-    private String avatarUrl;
+/**
+ * DTO for updating user and account information
+ * Allows updating both User and Account fields in a single request
+ */
+public class UserUpdateRequest {
 
-    // Account information (1:1 relationship)
-    private String accountId;
-    private String username;
+    // ==================== User Fields ====================
+
+    @Size(max = 100, message = "Họ tên không được vượt quá 100 ký tự")
+    private String fullName;
+
+    @Past(message = "Ngày sinh phải là ngày trong quá khứ")
+    private LocalDate dob;
+
+    private Gender gender;
+
+    @Pattern(regexp = "^[0-9]{10,20}$", message = "Số điện thoại phải có từ 10-20 chữ số")
+    private String phone;
+
+    @Size(max = 255, message = "Địa chỉ không được vượt quá 255 ký tự")
+    private String address;
+
+    // ==================== Account Fields ====================
+
+    @Email(message = "Email không hợp lệ")
+    @Size(max = 100, message = "Email không được vượt quá 100 ký tự")
     private String email;
+
+    @Size(min = 6, max = 50, message = "Password phải có độ dài từ 6-50 ký tự")
+    private String password;
+
     private Role role;
+
     private AccountStatus status;
 
-    public String getUserId() {
-        return userId;
+    // Note: Username is not included for security reasons (cannot be changed)
+
+    // ==================== Constructors ====================
+
+    public UserUpdateRequest() {
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    // ==================== Getters and Setters ====================
 
     public String getFullName() {
         return fullName;
@@ -71,37 +91,20 @@ public class UserResponse {
         this.address = address;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    // Account getters and setters
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Role getRole() {

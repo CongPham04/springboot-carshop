@@ -1,6 +1,8 @@
 package com.carshop.oto_shop.entities;
 
+import com.carshop.oto_shop.enums.Brand;
 import com.carshop.oto_shop.enums.CarStatus;
+import com.carshop.oto_shop.enums.Category;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -15,15 +17,13 @@ public class Car {
     @Column(name = "car_id", nullable = false, updatable = false)
     private Long carId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_cars_category"))
-    private CarCategory carCategory;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 20)
+    private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_cars_brand"))
-    private CarBrand carBrand;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "brand", nullable = false, length = 20)
+    private Brand brand;
 
     @Column(name = "model", nullable = false, length = 50)
     private String model;
@@ -69,20 +69,20 @@ public class Car {
         this.carId = carId;
     }
 
-    public CarCategory getCarCategory() {
-        return carCategory;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCarCategory(CarCategory carCategory) {
-        this.carCategory = carCategory;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public CarBrand getCarBrand() {
-        return carBrand;
+    public Brand getBrand() {
+        return brand;
     }
 
-    public void setCarBrand(CarBrand carBrand) {
-        this.carBrand = carBrand;
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
     public String getModel() {

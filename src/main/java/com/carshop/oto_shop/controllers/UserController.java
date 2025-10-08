@@ -3,14 +3,18 @@ package com.carshop.oto_shop.controllers;
 import com.carshop.oto_shop.common.exceptions.AppException;
 import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.common.response.ApiResponse;
+import com.carshop.oto_shop.dto.user.UserAccountRequest;
 import com.carshop.oto_shop.dto.user.UserResponse;
 import com.carshop.oto_shop.dto.user.UserRequest;
+import com.carshop.oto_shop.dto.user.UserUpdateRequest;
 import com.carshop.oto_shop.services.CarService;
 import com.carshop.oto_shop.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +35,19 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(
+        summary = "Create user with account",
+        description = "API to create a new user with complete account information in a single request. " +
+                      "Creates both Account and User records. Supports avatar upload."
+    )
+    @PostMapping(value = "/create-with-account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<UserResponse>> createUserWithAccount(
+            @Valid @ModelAttribute UserAccountRequest request) {
+        UserResponse response = userService.createUserWithAccount(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Tạo tài khoản và người dùng thành công!", response));
+    }
+
     @Operation(summary = "Add user", description = "API create new user")
     @PostMapping(value = "/{accountId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Void>> createUser(@ModelAttribute UserRequest userRequest, @PathVariable("accountId") String accountId) {
@@ -38,11 +55,17 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Thêm người dùng thành công!"));
     }
 
-    @Operation(summary = "Update user", description = "API update user" )
+    @Operation(
+        summary = "Update user with account",
+        description = "API to update user and account information. Supports updating: fullName, dob, gender, phone, address, email, password, role, status. " +
+                      "Password will be BCrypt hashed automatically."
+    )
     @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable("userId") String userId, @RequestBody UserRequest userRequest) {
-        userService.UpdateUser(userRequest, userId);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật người dùng thành công!"));
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+            @PathVariable("userId") String userId,
+            @Valid @RequestBody UserUpdateRequest request) {
+        UserResponse response = userService.updateUserWithAccount(request, userId);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật người dùng thành công!", response));
     }
 
     @Operation(summary = "Delete user", description = "Api delete user")
@@ -90,5 +113,12 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         List<UserResponse> dataUsers = userService.getAllUsers();
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công!", dataUsers));
+    }
+
+    @Operation(summary = "Get user by username", description = "API get user by username from account")
+    @GetMapping("/username/{username}")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserByUsername(@PathVariable("username") String username) {
+        UserResponse dataUser = userService.getUserByUsername(username);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công!", dataUser));
     }
 }

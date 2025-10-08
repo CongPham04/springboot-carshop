@@ -7,6 +7,7 @@ import com.carshop.oto_shop.dto.auth.SignupRequest;
 import com.carshop.oto_shop.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,9 +35,9 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Làm mới token thành công!", jwt));
     }
 
-    @Operation(summary = "Signup", description = "API register new account")
+    @Operation(summary = "Signup", description = "API register new account and user profile. Creates both Account and User with fullName.")
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Void>> register(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody SignupRequest signupRequest) {
         authService.register(signupRequest);
         return ResponseEntity.ok(ApiResponse.success("Đăng ký thành công"));
     }

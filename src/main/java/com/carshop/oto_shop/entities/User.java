@@ -19,7 +19,7 @@ public class User {
     @Column(name = "user_id", length = 36, nullable = false, updatable = false)
     private String userId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name = "account_id", nullable = false,
         foreignKey = @ForeignKey(name = "fk_users_account"))
     private Account account;

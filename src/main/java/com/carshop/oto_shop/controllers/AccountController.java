@@ -11,44 +11,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Deprecated
 @RestController
 @RequestMapping("/api/accounts")
-@Tag(name = "AccountController")
+@Tag(name = "AccountController", description = "⚠️ DEPRECATED: Use UserController instead. Account info is now included in User endpoints.")
 public class AccountController {
     private final AccountService accountService;
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-    @Operation(summary = "Add account", description = "API create new account")
+    @Deprecated
+    @Operation(summary = "Add account", description = "⚠️ DEPRECATED: API create new account")
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createAccount(@RequestBody AccountRequest accountRequest) {
         accountService.CreateAccount(accountRequest);
         return ResponseEntity.ok(ApiResponse.success("Thêm tài khoản thành công!"));
     }
 
-    @Operation(summary = "Update account", description = "API update account")
+    @Deprecated
+    @Operation(summary = "Update account", description = "⚠️ DEPRECATED: API update account")
     @PutMapping("/{accountId}")
     public ResponseEntity<ApiResponse<Void>> updateAccount(@PathVariable String accountId, @RequestBody AccountRequest accountRequest) {
         accountService.UpdateAccount(accountRequest, accountId);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật tài khoản thành công!"));
     }
 
-    @Operation(summary = "Delete account", description = "API delete account")
+    @Deprecated
+    @Operation(summary = "Delete account", description = "⚠️ DEPRECATED: API delete account")
     @DeleteMapping("/{accountId}")
     public ResponseEntity<ApiResponse<Void>> deleteAccount(@PathVariable String accountId) {
         accountService.DeleteAccount(accountId);
         return ResponseEntity.ok(ApiResponse.success("Xoá tài khoản thành công!"));
     }
 
-    @Operation(summary = "Get account detail", description = "API get account detail")
+    @Deprecated
+    @Operation(summary = "Get account detail", description = "⚠️ DEPRECATED: API get account detail")
     @GetMapping("/{accountId}")
     public ResponseEntity<ApiResponse<AccountResponse>> getAccount(@PathVariable String accountId) {
         AccountResponse dataAccounts = accountService.GetAccount(accountId);
         return ResponseEntity.ok(ApiResponse.success("Lấy thông tin tài khoản thành công!", dataAccounts));
     }
 
-    @Operation(summary = "Get all account", description = "API get all account")
+    @Deprecated
+    @Operation(summary = "Get all account", description = "⚠️ DEPRECATED: API get all account")
     @GetMapping
     public ResponseEntity<ApiResponse<List<AccountResponse>>> getAllAccounts() {
         List<AccountResponse> dataAccounts = accountService.GetAllAccounts();

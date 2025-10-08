@@ -1,6 +1,8 @@
 package com.carshop.oto_shop.dto.car;
 
+import com.carshop.oto_shop.enums.Brand;
 import com.carshop.oto_shop.enums.CarStatus;
+import com.carshop.oto_shop.enums.Category;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -8,9 +10,9 @@ import java.math.BigDecimal;
 public class CarResponse {
     private Long carId;
 
-    private Long brandId;
+    private Brand brand;
 
-    private Long categoryId;
+    private Category category;
 
     private String model;
 
@@ -36,20 +38,20 @@ public class CarResponse {
         this.carId = carId;
     }
 
-    public Long getBrandId() {
-        return brandId;
+    public Brand getBrand() {
+        return brand;
     }
 
-    public void setBrandId(Long brandId) {
-        this.brandId = brandId;
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getModel() {

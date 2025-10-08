@@ -7,9 +7,14 @@ import com.carshop.oto_shop.dto.auth.JwtResponse;
 import com.carshop.oto_shop.dto.auth.LoginRequest;
 import com.carshop.oto_shop.dto.auth.SignupRequest;
 import com.carshop.oto_shop.entities.Account;
+import com.carshop.oto_shop.entities.User;
 import com.carshop.oto_shop.repositories.AccountRepository;
+import com.carshop.oto_shop.repositories.UserRepository;
 import com.carshop.oto_shop.security.jwt.JwtTokenProvider;
 import com.carshop.oto_shop.security.models.CustomUserDetails;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,14 +25,18 @@ import java.util.regex.Pattern;
 
 @Service
 public class AuthService {
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
-    public AuthService(AccountRepository accountRepository ,PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+
+    public AuthService(AccountRepository accountRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -57,11 +66,15 @@ public class AuthService {
         throw new AppException(ErrorCode.INVALID_OR_EXPIRED_REFRESH_TOKEN);
     }
 
+    @Transactional
     public void register(SignupRequest request) {
         String username = request.getUsername();
+        String fullName = request.getFullName();
 
         // Kiểm tra có phải email không (rất đơn giản, chỉ cần chứa @)
         boolean isEmail = EMAIL_PATTERN.matcher(username).matches();
+
+        // Step 1: Create Account
         Account account = new Account();
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         if (isEmail) {
@@ -77,8 +90,18 @@ public class AuthService {
             }
             account.setUsername(username);
         }
+
         // role/status sẽ mặc định trong @PrePersist của Account nếu bạn để null
-        accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+        logger.info("Created account with ID: {}", savedAccount.getAccountId());
+
+        // Step 2: Create User linked to Account
+        User user = new User();
+        user.setAccount(savedAccount);
+        user.setFullName(fullName);
+
+        User savedUser = userRepository.save(user);
+        logger.info("Created user with ID: {} for account: {}", savedUser.getUserId(), savedAccount.getAccountId());
     }
 
 

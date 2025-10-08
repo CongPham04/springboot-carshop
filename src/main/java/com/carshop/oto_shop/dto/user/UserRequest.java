@@ -1,6 +1,7 @@
 package com.carshop.oto_shop.dto.user;
 
 import com.carshop.oto_shop.enums.Gender;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
