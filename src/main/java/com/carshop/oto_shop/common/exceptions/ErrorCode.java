@@ -20,7 +20,10 @@ public enum ErrorCode {
     UNKNOWN("UNKNOWN_ERROR", "Lỗi không xác định!", HttpStatus.INTERNAL_SERVER_ERROR),
     BAD_REQUEST("BAD_REQUEST", "Dữ liệu đầu vào không hợp lệ!", HttpStatus.BAD_REQUEST),
     METHOD_NOT_ALLOWED("METHOD_NOT_ALLOWED", "Phương thức HTTP không được hỗ trợ!", HttpStatus.METHOD_NOT_ALLOWED),
-    INVALID_OR_EXPIRED_REFRESH_TOKEN("INVALID_OR_EXPIRED_REFRESH_TOKEN", "Refresh token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),;
+    INVALID_OR_EXPIRED_REFRESH_TOKEN("INVALID_OR_EXPIRED_REFRESH_TOKEN", "Refresh token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
+    ORDER_NOT_FOUND("ORDER_NOT_FOUND", "Đơn hàng không tồn tại!", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_NOT_FOUND("ORDER_DETAIL_NOT_FOUND", "Chi tiết đơn hàng không tồn tại!", HttpStatus.NOT_FOUND),
+    PAYMENT_NOT_FOUND("PAYMENT_NOT_FOUND", "Thanh toán không tồn tại!", HttpStatus.NOT_FOUND);
     private final String code;
     private final String message;
     private final HttpStatus httpStatus;

@@ -105,17 +105,9 @@ public class CarBrandService {
     public void deleteCarBrand(Long brandId) {
         CarBrand carBrand = carBrandRepository.findById(brandId)
                 .orElseThrow(() -> new AppException(ErrorCode.CARBRAND_NOT_FOUND));
-        // Tìm toàn bộ Car thuộc Brand này
-        List<Car> cars = carRepository.findAllByCarBrand_BrandId(brandId);
-        if (!cars.isEmpty()) {
-            for (Car car : cars) {
-                if (car.getImageUrl() != null && !car.getImageUrl().isBlank()) {
-                    deleteImageFile(car.getImageUrl());
-                }
-            }
-            // Xoá toàn bộ Car trước khi xoá Brand
-            carRepository.deleteAll(cars);
-        }
+        // NOTE: Car now uses Brand enum instead of CarBrand entity relationship
+        // No need to delete related cars since brand is now an enum field
+        // List<Car> cars = carRepository.findAllByCarBrand_BrandId(brandId); // OLD METHOD - REMOVED
         carBrandRepository.delete(carBrand);
     }
 

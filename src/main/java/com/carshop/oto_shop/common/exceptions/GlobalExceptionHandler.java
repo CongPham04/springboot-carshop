@@ -115,7 +115,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setMessage(ErrorCode.INTERNAL_SERVER_ERROR.getMessage() + " - Exception:" + e.getClass().getSimpleName());
+     //   errorResponse.setMessage(ErrorCode.INTERNAL_SERVER_ERROR.getMessage() + " - Exception:" + e.getClass().getSimpleName());
+        errorResponse.setMessage(e.getMessage());
         errorResponse.setErrorCode(ErrorCode.INTERNAL_SERVER_ERROR.getCode());
         errorResponse.setStatus(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value());
         errorResponse.setTimestamp(LocalDateTime.now());

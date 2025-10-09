@@ -5,9 +5,12 @@ import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.common.response.ApiResponse;
 import com.carshop.oto_shop.dto.car.CarRequest;
 import com.carshop.oto_shop.dto.car.CarResponse;
+import com.carshop.oto_shop.enums.Brand;
+import com.carshop.oto_shop.enums.Category;
 import com.carshop.oto_shop.services.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -31,16 +34,16 @@ public class CarController {
         this.carService = carService;
     }
 
-    @Operation(summary = "Add car", description = "API create new car")
+    @Operation(summary = "Add car", description = "API create new car with Brand and Category enums")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Void>> createCar(@ModelAttribute CarRequest carRequest ) {
+    public ResponseEntity<ApiResponse<Void>> createCar(@Valid @ModelAttribute CarRequest carRequest ) {
         carService.createCar(carRequest);
         return ResponseEntity.ok(ApiResponse.success("Thêm sản phẩm thành công!"));
     }
 
-    @Operation(summary = "Update car", description = "API update car")
+    @Operation(summary = "Update car", description = "API update car with Brand and Category enums")
     @PutMapping(value = "/{carId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Void>> updateCar(@PathVariable("carId") Long carId, @ModelAttribute CarRequest carRequest ) {
+    public ResponseEntity<ApiResponse<Void>> updateCar(@PathVariable("carId") Long carId, @Valid @ModelAttribute CarRequest carRequest ) {
         carService.updateCar(carRequest,carId);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật sản phẩm thành công!"));
     }
@@ -85,17 +88,17 @@ public class CarController {
         }
     }
 
-    @Operation(summary = "Get cars by brand", description = "API get all cars by brandId")
-    @GetMapping("/brand/{brandId}")
-    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByBrand(@PathVariable("brandId") Long brandId) {
-        List<CarResponse> dataCars = carService.getCarsByBrand(brandId);
+    @Operation(summary = "Get cars by brand", description = "API get all cars by Brand enum (TOYOTA, HYUNDAI, MERCEDES, VINFAST)")
+    @GetMapping("/brand/{brand}")
+    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByBrand(@PathVariable("brand") Brand brand) {
+        List<CarResponse> dataCars = carService.getCarsByBrand(brand);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách xe theo brand thành công!", dataCars));
     }
 
-    @Operation(summary = "Get cars by category", description = "API get all cars by categoryId")
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByCategory(@PathVariable("categoryId") Long categoryId) {
-        List<CarResponse> dataCars = carService.getCarsByCategory(categoryId);
+    @Operation(summary = "Get cars by category", description = "API get all cars by Category enum (SUV, SEDAN, HATCHBACK)")
+    @GetMapping("/category/{category}")
+    public ResponseEntity<ApiResponse<List<CarResponse>>> getCarsByCategory(@PathVariable("category") Category category) {
+        List<CarResponse> dataCars = carService.getCarsByCategory(category);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách xe theo category thành công!", dataCars));
     }
 

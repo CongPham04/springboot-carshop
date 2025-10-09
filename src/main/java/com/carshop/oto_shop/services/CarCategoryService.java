@@ -101,17 +101,9 @@ public class CarCategoryService {
     public void deleteCarCategory(Long categoryId) {
         CarCategory carCategory = carCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new AppException(ErrorCode.CARCATEGORY_NOT_FOUND));
-        // Lấy tất cả Car thuộc category này
-        List<Car> cars = carRepository.findAllByCarCategory_CategoryId(categoryId);
-        if (!cars.isEmpty()) {
-            for (Car car : cars) {
-                if (car.getImageUrl() != null && !car.getImageUrl().isBlank()) {
-                    deleteImageFile(car.getImageUrl());
-                }
-            }
-            // Xoá toàn bộ car thuộc categoryId
-            carRepository.deleteAll(cars);
-        }
+        // NOTE: Car now uses Category enum instead of CarCategory entity relationship
+        // No need to delete related cars since category is now an enum field
+        // List<Car> cars = carRepository.findAllByCarCategory_CategoryId(categoryId); // OLD METHOD - REMOVED
         carCategoryRepository.delete(carCategory);
     }
 

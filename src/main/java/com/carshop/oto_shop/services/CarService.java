@@ -6,11 +6,9 @@ import com.carshop.oto_shop.common.exceptions.ErrorCode;
 import com.carshop.oto_shop.dto.car.CarRequest;
 import com.carshop.oto_shop.dto.car.CarResponse;
 import com.carshop.oto_shop.entities.Car;
-import com.carshop.oto_shop.entities.CarBrand;
-import com.carshop.oto_shop.entities.CarCategory;
+import com.carshop.oto_shop.enums.Brand;
+import com.carshop.oto_shop.enums.Category;
 import com.carshop.oto_shop.mappers.CarMapper;
-import com.carshop.oto_shop.repositories.CarBrandRepository;
-import com.carshop.oto_shop.repositories.CarCategoryRepository;
 import com.carshop.oto_shop.repositories.CarDetailRepository;
 import com.carshop.oto_shop.repositories.CarRepository;
 import org.slf4j.Logger;
@@ -33,34 +31,25 @@ public class CarService {
     private static final Logger logger = LoggerFactory.getLogger(CarService.class);
     private final CarRepository carRepository;
     private final CarMapper carMapper;
-    private final CarCategoryRepository carCategoryRepository;
-    private final CarBrandRepository carBrandRepository;
     private final CarDetailRepository carDetailRepository;
     public static final String UPLOAD_DIR = "uploads/cars/";
     private static final String BASE_IMAGE_URL = "http://localhost:8080/carshop/api/cars/image/";
 
-    public CarService(CarRepository carRepository, CarMapper carMapper , CarCategoryRepository carCategoryRepository, CarBrandRepository carBrandRepository, CarDetailRepository carDetailRepository) {
+    public CarService(CarRepository carRepository, CarMapper carMapper, CarDetailRepository carDetailRepository) {
         this.carRepository = carRepository;
         this.carMapper = carMapper;
-        this.carCategoryRepository = carCategoryRepository;
-        this.carBrandRepository = carBrandRepository;
         this.carDetailRepository = carDetailRepository;
     }
 
     public void createCar(CarRequest carRequest) {
         try{
-            CarCategory carCategory = carCategoryRepository.findById(carRequest.getCategoryId())
-                    .orElseThrow(() -> new AppException(ErrorCode.CARCATEGORY_NOT_FOUND));
-            CarBrand carBrand = carBrandRepository.findById(carRequest.getBrandId())
-                    .orElseThrow(() -> new AppException(ErrorCode.CARBRAND_NOT_FOUND));
             Car car = carMapper.toCar(carRequest);
             String imageUrl = null;
             if(carRequest.getImageFile() != null && !carRequest.getImageFile().isEmpty()) {
                 imageUrl = saveImage(carRequest.getImageFile());
             }
-            logger.info("Model: " + carRequest.getModel());
-            car.setCarCategory(carCategory);
-            car.setCarBrand(carBrand);
+            logger.info("Creating car - Model: {}, Brand: {}, Category: {}",
+                carRequest.getModel(), carRequest.getBrand(), carRequest.getCategory());
             car.setImageUrl(imageUrl);
             carRepository.save(car);
         }catch (DataIntegrityViolationException ex){
@@ -158,8 +147,6 @@ public class CarService {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new AppException(ErrorCode.CAR_NOT_FOUND));
         CarResponse response = carMapper.toCarResponse(car);
-        response.setBrandId(car.getCarBrand().getBrandId());
-        response.setCategoryId(car.getCarCategory().getCategoryId());
         if (car.getImageUrl() != null) {
             // Thay "/uploads/xxx.png" thành full URL API
             String fileName = Paths.get(car.getImageUrl()).getFileName().toString();
@@ -168,13 +155,11 @@ public class CarService {
         return response;
     }
 
-    public List<CarResponse> getCarsByBrand(Long brandId) {
-        List<Car> cars = carRepository.findAllByCarBrand_BrandId(brandId);
+    public List<CarResponse> getCarsByBrand(Brand brand) {
+        List<Car> cars = carRepository.findAllByBrand(brand);
         return cars.stream()
                 .map(car -> {
                     CarResponse response = carMapper.toCarResponse(car);
-                    response.setBrandId(car.getCarBrand().getBrandId());
-                    response.setCategoryId(car.getCarCategory().getCategoryId());
                     if (car.getImageUrl() != null) {
                         String fileName = Paths.get(car.getImageUrl()).getFileName().toString();
                         response.setImageUrl(BASE_IMAGE_URL + fileName);
@@ -184,14 +169,11 @@ public class CarService {
                 .toList();
     }
 
-    public List<CarResponse> getCarsByCategory(Long categoryId) {
-        List<Car> cars = carRepository.findAllByCarCategory_CategoryId(categoryId);
+    public List<CarResponse> getCarsByCategory(Category category) {
+        List<Car> cars = carRepository.findAllByCategory(category);
         return cars.stream()
                 .map(car -> {
                     CarResponse response = carMapper.toCarResponse(car);
-                    //Vì đối tượng car không có BrandId và CategoryId nên phải set cho nó
-                    response.setBrandId(car.getCarBrand().getBrandId());
-                    response.setCategoryId(car.getCarCategory().getCategoryId());
                     if (car.getImageUrl() != null) {
                         String fileName = Paths.get(car.getImageUrl()).getFileName().toString();
                         response.setImageUrl(BASE_IMAGE_URL + fileName);
@@ -206,8 +188,6 @@ public class CarService {
         return cars.stream()
                 .map(car -> {
                     CarResponse response = carMapper.toCarResponse(car);
-                    response.setBrandId(car.getCarBrand().getBrandId());
-                    response.setCategoryId(car.getCarCategory().getCategoryId());
                     if (car.getImageUrl() != null) {
                         String fileName = Paths.get(car.getImageUrl()).getFileName().toString();
                         response.setImageUrl(BASE_IMAGE_URL + fileName);

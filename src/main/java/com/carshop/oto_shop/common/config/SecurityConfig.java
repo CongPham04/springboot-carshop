@@ -59,20 +59,54 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
-                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands/**", "/api/car-details/**").permitAll()
+                                "/api/cars/**", "/api/car-details/**").permitAll()
+
+                        // Car and Account APIs - ADMIN only
                         .requestMatchers(HttpMethod.POST,
-                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.PUT,
-                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE,
-                                "/api/cars/**", "/api/car-categories/**", "/api/car-brands", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
+                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
+
+                        // User APIs - ADMIN + USER
                         .requestMatchers(HttpMethod.POST,
-                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                                "/api/users/**").hasAnyRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.DELETE,
-                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                                "/api/users/**").hasAnyRole(Role.ADMIN.name())
+
+                        // Order APIs
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/orders/**").hasRole(Role.ADMIN.name())
+
+                        // Order Detail APIs
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/order-details/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/order-details/**").hasRole(Role.ADMIN.name())
+
+                        // Payment APIs
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/api/payments/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/api/payments/**").hasRole(Role.ADMIN.name())
+
                         .anyRequest().authenticated()
+
                 );
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
