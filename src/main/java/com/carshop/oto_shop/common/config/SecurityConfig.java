@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPointJwt)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép truy cập swagger mà không cần login
+                        // ================== Swagger ==================
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -56,55 +56,78 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/auth/**").permitAll()
+
+                        // ================== AUTH ==================
+                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+
+                        // ================== HOME (public) ==================
                         .requestMatchers(HttpMethod.GET,
-                                "/api/cars/**", "/api/car-details/**").permitAll()
+                                "/api/home/**",
+                                "/api/meta/**",
+                                "/api/search/**").permitAll()
 
-                        // Car and Account APIs - ADMIN only
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/cars/**", "/api/accounts/**", "/api/car-details/**").hasRole(Role.ADMIN.name())
+                        // ================== CARS ==================
+                        // Public
+                        .requestMatchers(HttpMethod.GET, "/api/cars/**").permitAll()
+                        // Admin
+                        .requestMatchers(HttpMethod.POST, "/api/cars/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/cars/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/cars/**").hasRole(Role.ADMIN.name())
 
-                        // User APIs - ADMIN + USER
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/users/**").hasAnyRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/users/**").hasAnyRole(Role.ADMIN.name())
+                        // ================== CAR DETAILS ==================
+                        // Public
+                        .requestMatchers(HttpMethod.GET, "/api/car-details/**").permitAll()
+                        // Admin
+                        .requestMatchers(HttpMethod.POST, "/api/car-details/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/car-details/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/car-details/**").hasRole(Role.ADMIN.name())
 
-                        // Order APIs
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/orders/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PATCH,
-                                "/api/orders/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/orders/**").hasRole(Role.ADMIN.name())
+                        // ================== USERS ==================
+                        // Public avatar
+                        .requestMatchers(HttpMethod.GET, "/api/users/avatar/image/**").permitAll()
+                        // Admin management
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole(Role.ADMIN.name())
 
-                        // Order Detail APIs
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/order-details/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/order-details/**").hasRole(Role.ADMIN.name())
+                        // ================== ORDERS ==================
+                        // User + Admin
+                        .requestMatchers(HttpMethod.POST, "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        // Admin only
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole(Role.ADMIN.name())
 
-                        // Payment APIs
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-                        .requestMatchers(HttpMethod.PATCH,
-                                "/api/payments/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/payments/**").hasRole(Role.ADMIN.name())
+                        // ================== PAYMENTS ==================
+                        // User + Admin
+                        .requestMatchers(HttpMethod.POST, "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/payments/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        // Admin only
+                        .requestMatchers(HttpMethod.PATCH, "/api/payments/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/payments/**").hasRole(Role.ADMIN.name())
 
+                        // ================== PROMOTIONS ==================
+                        // Public
+                        .requestMatchers(HttpMethod.GET, "/api/promotions/**").permitAll()
+                        // Admin
+                        .requestMatchers(HttpMethod.POST, "/api/promotions/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/promotions/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/promotions/**").hasRole(Role.ADMIN.name())
+
+                        // ================== NEWS ==================
+                        // Public
+                        .requestMatchers(HttpMethod.GET, "/api/news/**").permitAll()
+                        // Admin
+                        .requestMatchers(HttpMethod.POST, "/api/news/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/news/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/news/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PATCH, "/api/news/**").hasRole(Role.ADMIN.name())
+
+                        // ================== ADMIN DASHBOARD ==================
+                        .requestMatchers(HttpMethod.GET, "/api/admin/**").hasRole(Role.ADMIN.name())
+
+                        // ================== Any other ==================
                         .anyRequest().authenticated()
 
                 );

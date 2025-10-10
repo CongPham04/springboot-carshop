@@ -11,6 +11,7 @@ import com.carshop.oto_shop.enums.Category;
 import com.carshop.oto_shop.mappers.CarMapper;
 import com.carshop.oto_shop.repositories.CarDetailRepository;
 import com.carshop.oto_shop.repositories.CarRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -81,7 +82,7 @@ public class CarService {
             logger.error("Loi khi xoa anh: " + e.getMessage());
         }
     }
-
+    @Transactional
     public void updateCar(CarRequest carRequest, Long carId) {
         try {
             Car car = carRepository.findById(carId)
@@ -132,7 +133,7 @@ public class CarService {
             throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
         }
     }
-
+    @Transactional
     public void deleteCar(Long carId) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new AppException(ErrorCode.CAR_NOT_FOUND));

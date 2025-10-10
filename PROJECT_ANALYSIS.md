@@ -265,6 +265,7 @@ com.carshop.oto_shop/
                            │ total_amount│  │
                            │ order_date │   │
                            │ status     │   │
+                           │ cancel_reason│ │
                            │ created_at │   │
                            │ updated_at │   │
                            └────────────┘   │
@@ -275,6 +276,7 @@ com.carshop.oto_shop/
                                  │     │order_detail_id PK│
                                  │     │order_id FK  │
                                  │     │car_id FK    │
+                                 │     │color_name ENUM│
                                  │     │quantity     │
                                  │     │price        │
                                  │     └─────────────┘
@@ -293,51 +295,49 @@ com.carshop.oto_shop/
                            │updated_at  │    │
                            └────────────┘    │
                                              │
-┌─────────────────┐                         │
-│ car_categories  │                         │
-│─────────────────│                         │
-│ category_id PK  │───┐                     │
-│ category_name UK│   │                     │
-└─────────────────┘   │                     │
-                      │ N:1                 │
-┌──────────────┐      │                     │
-│  car_brands  │      │                     │
-│──────────────│      │                     │
-│ brand_id PK  │──┐   │                     │
-│ brand_name UK│  │   │                     │
-└──────────────┘  │   │                     │
-                  │ N:1 (⚠️ Now using enums)│
-                  ↓   ↓                     │
               ┌────────────┐                │
               │    cars    │────────────────┘
-              │────────────│
-              │ car_id PK  │───┐
-              │ brand ENUM │   │ 1:1
-              │ category ENUM│ │
-              │ model       │  │
-              │ manufacture_year│
-              │ price       │  │
-              │ color       │  │
-              │ description │  │
-              │ status      │  │
-              │ image_url   │  │
-              └────────────┘  │
-                              ↓
-                         ┌──────────────┐
-                         │ car_details  │
-                         │──────────────│
-                         │ car_detail_id PK │
-                         │ car_id FK UK │
-                         │ engine       │
-                         │ horsepower   │
-                         │ torque       │
-                         │ transmission │
-                         │ fuel_type    │
-                         │ fuel_consumption │
-                         │ seats        │
-                         │ weight       │
-                         │ dimensions   │
-                         └──────────────┘
+              │────────────│────────┐
+              │ car_id PK  │───┐    │
+              │ brand ENUM │   │ 1:1  │ 1:N
+              │ category ENUM│ │    │
+              │ model       │  │    │
+              │ manufacture_year│    │
+              │ price       │  │    │
+              │ color ENUM  │  │    │
+              │ description │  │    │
+              │ status      │  │    │
+              │ image_url   │  │    │
+              └────────────┘  │    │
+                              ↓    │
+                         ┌──────────────┐│
+                         │ car_details  ││
+                         │──────────────││
+                         │ car_detail_id PK ││
+                         │ car_id FK UK ││
+                         │ engine       ││
+                         │ horsepower   ││
+                         │ torque       ││
+                         │ transmission ││
+                         │ fuel_type    ││
+                         │ fuel_consumption ││
+                         │ seats        ││
+                         │ weight       ││
+                         │ dimensions   ││
+                         └──────────────┘│
+                                       ↓
+┌──────────────┐       ┌─────────────┐   ┌─────────────┐
+│     news     │       │ promotions  │───│promotion_cars│
+│──────────────│       │─────────────│   │─────────────│
+│ news_id PK   │       │ promotion_id PK │ │ promotion_id FK │
+│ title        │       │ title       │   │ car_id FK   │
+│ slug         │       │ description │   └─────────────┘
+│ content      │       │ discount_type │
+│ status       │       │ discount_value│
+│ published_at │       │ start_at    │
+└──────────────┘       │ end_at      │
+                       │ active      │
+                       └─────────────┘
 ```
 
 ### Entity Details

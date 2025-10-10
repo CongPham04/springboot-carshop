@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
+
     @Bean
     public OpenAPI customOpenAPI(@Value("${swagger.title}") String title,
                                  @Value("${swagger.version}") String version,
@@ -20,12 +21,12 @@ public class SwaggerConfig {
                                  @Value("${swagger.contact-email}") String contactEmail) {
         return new OpenAPI()
                 .info(new Info()
-                    .title(title)
-                    .version(version)
-                    .description(description)
-                    .contact(new Contact()
-                            .name(contactName)
-                            .email(contactEmail)))
+                        .title(title)
+                        .version(version)
+                        .description(description)
+                        .contact(new Contact()
+                                .name(contactName)
+                                .email(contactEmail)))
                 .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("BearerAuth",
@@ -33,39 +34,64 @@ public class SwaggerConfig {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
-
     }
 
-    // Nhóm API
+    // ================== ALL ==================
     @Bean
-    public GroupedOpenApi api() {
+    public GroupedOpenApi allApi() {
         return GroupedOpenApi.builder()
-                .group("Auto88 API")
+                .group("All API")
                 .pathsToMatch("/**")
                 .build();
     }
 
-    @Bean
-    public GroupedOpenApi userApi() {
-        return GroupedOpenApi.builder()
-                .group("User API")
-                .pathsToMatch("/api/users/{userId}","/api/accounts/{accountId}")
-                .build();
-    }
-
+    // ================== PUBLIC ==================
     @Bean
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("Public API")
-                .pathsToMatch("/api/auth/**")
+                .pathsToMatch(
+                        "/api/auth/**",
+                        "/api/home/**",
+                        "/api/meta/**",
+                        "/api/search/**",
+                        "/api/cars/**",
+                        "/api/car-details/**",
+                        "/api/promotions/**",
+                        "/api/news/**",
+                        "/api/users/avatar/image/**"
+                )
                 .build();
     }
 
+    // ================== USER ==================
     @Bean
-    public  GroupedOpenApi adminApi() {
+    public GroupedOpenApi userApi() {
+        return GroupedOpenApi.builder()
+                .group("User API")
+                .pathsToMatch(
+                        "/api/orders/**",
+                        "/api/payments/**"
+                        // nếu muốn thêm user profile (ví dụ /api/users/me) thì thêm ở đây
+                )
+                .build();
+    }
+
+    // ================== ADMIN ==================
+    @Bean
+    public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("Admin API")
-                .pathsToMatch("/api/users/**", "/api/accounts/**", "/api/cars/**", "/api/car-details/**", "/api/orders/**", "/api/order-details/**", "/api/payments/**")
+                .pathsToMatch(
+                        "/api/admin/**",
+                        "/api/users/**",
+                        "/api/cars/**",
+                        "/api/car-details/**",
+                        "/api/orders/**",
+                        "/api/payments/**",
+                        "/api/promotions/**",
+                        "/api/news/**"
+                )
                 .build();
     }
 }

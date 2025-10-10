@@ -25,10 +25,10 @@ public class PromotionService {
     }
 
     @Transactional
-    public PromotionResponseDto createPromotion(PromotionRequestDto requestDto) {
+    public void createPromotion(PromotionRequestDto requestDto) {
         Promotion promotion = promotionMapper.toPromotion(requestDto);
         Promotion savedPromotion = promotionRepository.save(promotion);
-        return promotionMapper.toPromotionResponseDto(savedPromotion);
+        promotionMapper.toPromotionResponseDto(savedPromotion);
     }
 
     @Transactional(readOnly = true)
@@ -46,13 +46,13 @@ public class PromotionService {
     }
 
     @Transactional
-    public PromotionResponseDto updatePromotion(Long id, PromotionRequestDto requestDto) {
+    public void updatePromotion(Long id, PromotionRequestDto requestDto) {
         Promotion existingPromotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PROMOTION_NOT_FOUND));
 
         promotionMapper.updatePromotionFromDto(requestDto, existingPromotion);
         Promotion updatedPromotion = promotionRepository.save(existingPromotion);
-        return promotionMapper.toPromotionResponseDto(updatedPromotion);
+        promotionMapper.toPromotionResponseDto(updatedPromotion);
     }
 
     @Transactional
