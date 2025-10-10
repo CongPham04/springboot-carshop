@@ -1,5 +1,6 @@
 package com.carshop.oto_shop.dto.orderdetail;
 
+import com.carshop.oto_shop.enums.Color;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,6 +12,8 @@ public class OrderDetailRequest {
     @NotNull(message = "Số lượng không được để trống")
     @Min(value = 1, message = "Số lượng phải lớn hơn 0")
     private Integer quantity;
+
+    private Color colorName;
 
     // Getters and Setters
     public Long getCarId() {
@@ -27,5 +30,13 @@ public class OrderDetailRequest {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Color getColorName() {
+        return colorName;
+    }
+
+    public void setColorName(Color colorName) {
+        this.colorName = colorName;
     }
 }

@@ -77,6 +77,17 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái đơn hàng thành công!", orderResponse));
     }
 
+    @Operation(summary = "User cancel order", description = "API for user to cancel their order")
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(
+            @PathVariable String orderId,
+            @RequestBody(required = false) String cancelReason) {
+        // The service logic will need to verify that the user owns this order
+        // and that the order is in a cancellable state (e.g., PENDING).
+        OrderResponse orderResponse = orderService.cancelOrder(orderId, cancelReason);
+        return ResponseEntity.ok(ApiResponse.success("Hủy đơn hàng thành công!", orderResponse));
+    }
+
     @Operation(summary = "Delete order", description = "API delete order")
     @DeleteMapping("/{orderId}")
     public ResponseEntity<ApiResponse<Void>> deleteOrder(@PathVariable String orderId) {

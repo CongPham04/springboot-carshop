@@ -77,6 +77,7 @@ public class OrderService {
                 orderDetail.setOrder(order);
                 orderDetail.setCar(car);
                 orderDetail.setQuantity(detailRequest.getQuantity());
+                orderDetail.setColorName(detailRequest.getColorName()); // Snapshot color at order time
                 orderDetail.setPrice(car.getPrice()); // Snapshot price at order time
 
                 BigDecimal itemTotal = car.getPrice().multiply(BigDecimal.valueOf(detailRequest.getQuantity()));
@@ -250,6 +251,31 @@ public class OrderService {
             }
         } catch (Exception e) {
             logger.error("Error updating order status: {}", e.getMessage(), e);
+            throw new AppException(ErrorCode.UNKNOWN);
+        }
+    }
+
+    @Transactional
+    public OrderResponse cancelOrder(String orderId, String cancelReason) {
+        try {
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+            // Business rule: Only PENDING orders can be cancelled by the user
+            if (order.getStatus() != OrderStatus.PENDING) {
+                throw new AppException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
+            }
+
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setCancelReason(cancelReason);
+            Order updatedOrder = orderRepository.save(order);
+
+            logger.info("User cancelled order {}. Reason: {}", orderId, cancelReason);
+            return orderMapper.toOrderResponse(updatedOrder);
+        } catch (AppException e) {
+            throw e; // Re-throw known exceptions
+        } catch (Exception e) {
+            logger.error("Error cancelling order: {}", e.getMessage(), e);
             throw new AppException(ErrorCode.UNKNOWN);
         }
     }

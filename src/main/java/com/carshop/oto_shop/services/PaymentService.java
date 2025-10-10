@@ -126,6 +126,50 @@ public class PaymentService {
     }
 
     @Transactional
+    public PaymentResponse confirmPayment(String paymentId) {
+        try {
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setPaymentDate(LocalDateTime.now());
+
+            // Business rule: When payment is confirmed, update the order status
+            Order order = payment.getOrder();
+            if (order != null) {
+                order.setStatus(com.carshop.oto_shop.enums.OrderStatus.CONFIRMED);
+                orderRepository.save(order);
+                logger.info("Updated order {} status to CONFIRMED due to payment confirmation", order.getOrderId());
+            }
+
+            Payment updatedPayment = paymentRepository.save(payment);
+            logger.info("Confirmed payment {}", paymentId);
+
+            return paymentMapper.toPaymentResponse(updatedPayment);
+        } catch (Exception e) {
+            logger.error("Error confirming payment: {}", e.getMessage(), e);
+            throw new AppException(ErrorCode.UNKNOWN);
+        }
+    }
+
+    @Transactional
+    public PaymentResponse failPayment(String paymentId) {
+        try {
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
+            payment.setStatus(PaymentStatus.FAILED);
+            Payment updatedPayment = paymentRepository.save(payment);
+            logger.warn("Marked payment {} as FAILED", paymentId);
+
+            return paymentMapper.toPaymentResponse(updatedPayment);
+        } catch (Exception e) {
+            logger.error("Error failing payment: {}", e.getMessage(), e);
+            throw new AppException(ErrorCode.UNKNOWN);
+        }
+    }
+
+    @Transactional
     public void deletePayment(String paymentId) {
         try {
             Payment payment = paymentRepository.findById(paymentId)

@@ -69,6 +69,9 @@ public class Order {
     @Column(name = "status", nullable = false, length = 20)
     private OrderStatus status;
 
+    @Column(name = "cancel_reason", length = 255)
+    private String cancelReason;
+
     // Audit timestamps
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -235,6 +238,14 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 
     public LocalDateTime getCreatedAt() {

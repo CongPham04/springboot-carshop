@@ -23,6 +23,9 @@ public enum ErrorCode {
     INVALID_OR_EXPIRED_REFRESH_TOKEN("INVALID_OR_EXPIRED_REFRESH_TOKEN", "Refresh token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
     ORDER_NOT_FOUND("ORDER_NOT_FOUND", "Đơn hàng không tồn tại!", HttpStatus.NOT_FOUND),
     ORDER_DETAIL_NOT_FOUND("ORDER_DETAIL_NOT_FOUND", "Chi tiết đơn hàng không tồn tại!", HttpStatus.NOT_FOUND),
+    ORDER_CANNOT_BE_CANCELLED("ORDER_CANNOT_BE_CANCELLED", "Đơn hàng không thể hủy!", HttpStatus.BAD_REQUEST),
+    NEWS_NOT_FOUND("NEWS_NOT_FOUND", "Tin tức không tồn tại!", HttpStatus.NOT_FOUND),
+    PROMOTION_NOT_FOUND("PROMOTION_NOT_FOUND", "Khuyến mãi không tồn tại!", HttpStatus.NOT_FOUND),
     PAYMENT_NOT_FOUND("PAYMENT_NOT_FOUND", "Thanh toán không tồn tại!", HttpStatus.NOT_FOUND);
     private final String code;
     private final String message;

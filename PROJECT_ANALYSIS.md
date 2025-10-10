@@ -1,6 +1,6 @@
 # Auto88 Car Shop - Spring Boot Project Analysis
 
-**Analysis Date:** October 8, 2025
+**Analysis Date:** October 9, 2025
 **Project Name:** oto-shop (Auto88 Car Shop API)
 **Version:** 0.0.1-SNAPSHOT
 **Base URL:** http://localhost:8080/carshop
@@ -23,7 +23,7 @@
 
 ## 🎯 Project Overview
 
-Auto88 Car Shop is a **RESTful API** built with **Spring Boot 3.5.5** for managing a car sales system. The application provides comprehensive functionality for car inventory management, user authentication, and role-based access control.
+Auto88 Car Shop is a **RESTful API** built with **Spring Boot 3.5.5** for managing a car sales system. The application provides comprehensive functionality for car inventory management, user authentication, a complete order management system, and role-based access control.
 
 **Key Characteristics:**
 - **Type:** Spring Boot REST API
@@ -116,12 +116,15 @@ com.carshop.oto_shop/
 │   └── response/            # API response wrappers
 │       └── ApiResponse.java
 ├── controllers/             # REST API controllers
-│   ├── AccountController.java
+│   ├── AccountController.java (⚠️ Deprecated)
 │   ├── AuthController.java
 │   ├── CarBrandController.java
 │   ├── CarCategoryController.java
-│   ├── CarController.java
+│   ├── CarController.java (UPDATED - uses Brand/Category enums)
 │   ├── CarDetailController.java
+│   ├── OrderController.java (NEW)
+│   ├── OrderDetailController.java (NEW)
+│   ├── PaymentController.java (NEW)
 │   └── UserController.java
 ├── dto/                     # Data Transfer Objects
 │   ├── account/
@@ -130,6 +133,15 @@ com.carshop.oto_shop/
 │   ├── carbrand/
 │   ├── carcategory/
 │   ├── cardetail/
+│   ├── order/ (NEW)
+│   │   ├── OrderRequest.java
+│   │   └── OrderResponse.java
+│   ├── orderdetail/ (NEW)
+│   │   ├── OrderDetailRequest.java
+│   │   └── OrderDetailResponse.java
+│   ├── payment/ (NEW)
+│   │   ├── PaymentRequest.java
+│   │   └── PaymentResponse.java
 │   └── user/
 │       ├── UserAccountRequest.java (NEW - combined account+user)
 │       ├── UserUpdateRequest.java (NEW - update account+user)
@@ -137,19 +149,43 @@ com.carshop.oto_shop/
 │       └── UserResponse.java (UPDATED - includes account fields)
 ├── entities/               # JPA entities
 │   ├── Account.java
-│   ├── Car.java
+│   ├── Car.java (UPDATED - uses Brand/Category enums)
 │   ├── CarBrand.java
 │   ├── CarCategory.java
 │   ├── CarDetail.java
+│   ├── Order.java (NEW)
+│   ├── OrderDetail.java (NEW)
+│   ├── Payment.java (NEW)
 │   └── User.java
 ├── enums/                  # Enumerations
+│   ├── AccountStatus.java
+│   ├── Brand.java (NEW - Toyota, Hyundai, Mercedes, Vinfast)
+│   ├── CarStatus.java
+│   ├── Category.java (NEW - SUV, Sedan, Hatchback)
+│   ├── Gender.java
+│   ├── OrderStatus.java (NEW)
+│   ├── PaymentMethod.java (NEW)
+│   ├── PaymentStatus.java (NEW)
+│   └── Role.java
 ├── mappers/                # MapStruct mappers
+│   ├── AccountMapper.java
+│   ├── CarBrandMapper.java
+│   ├── CarCategoryMapper.java
+│   ├── CarDetailMapper.java
+│   ├── CarMapper.java
+│   ├── OrderDetailMapper.java (NEW)
+│   ├── OrderMapper.java (NEW)
+│   ├── PaymentMapper.java (NEW)
+│   └── UserMapper.java
 ├── repositories/           # Spring Data JPA repositories
 │   ├── AccountRepository.java
 │   ├── CarBrandRepository.java
 │   ├── CarCategoryRepository.java
 │   ├── CarDetailRepository.java
-│   ├── CarRepository.java
+│   ├── CarRepository.java (UPDATED - uses Brand/Category enums)
+│   ├── OrderDetailRepository.java (NEW)
+│   ├── OrderRepository.java (NEW)
+│   ├── PaymentRepository.java (NEW)
 │   └── UserRepository.java
 ├── security/               # Security components
 │   ├── handers/           # Security handlers
@@ -160,10 +196,13 @@ com.carshop.oto_shop/
 └── services/              # Business logic services
     ├── AccountService.java
     ├── AuthService.java
-    ├── CarBrandService.java
-    ├── CarCategoryService.java
+    ├── CarBrandService.java (UPDATED - removed car deletion logic)
+    ├── CarCategoryService.java (UPDATED - removed car deletion logic)
     ├── CarDetailService.java
-    ├── CarService.java
+    ├── CarService.java (UPDATED - uses Brand/Category enums)
+    ├── OrderDetailService.java (NEW)
+    ├── OrderService.java (NEW)
+    ├── PaymentService.java (NEW)
     └── UserService.java
 ```
 
@@ -195,63 +234,110 @@ com.carshop.oto_shop/
 └──────────────┘   │
                    ↓
               ┌─────────┐
-              │  users  │
-              │─────────│
-              │ user_id PK │
-              │ account_id FK │
-              │ full_name │
-              │ dob       │
-              │ gender    │
-              │ phone UK  │
-              │ address   │
-              │ avatar_url│
-              └─────────┘
-
-┌─────────────────┐
-│ car_categories  │
-│─────────────────│
-│ category_id PK  │───┐
-│ category_name UK│   │
-└─────────────────┘   │
-                      │ N:1
-┌──────────────┐      │
-│  car_brands  │      │
-│──────────────│      │
-│ brand_id PK  │──┐   │
-│ brand_name UK│  │   │
-└──────────────┘  │   │
-                  │ N:1
-                  ↓   ↓
-              ┌────────────┐
-              │    cars    │
+              │  users  │───────┐
+              │─────────│       │
+              │ user_id PK │    │ 1:N
+              │ account_id FK │ │
+              │ full_name │     │
+              │ dob       │     │
+              │ gender    │     │
+              │ phone UK  │     │
+              │ address   │     │
+              │ avatar_url│     │
+              └─────────┘       │
+                                ↓
+                           ┌────────────┐
+                           │   orders   │───┐
+                           │────────────│   │
+                           │ order_id PK│   │ 1:N
+                           │ user_id FK │   │
+                           │ full_name  │   │
+                           │ email      │   │
+                           │ phone      │   │
+                           │ address    │   │
+                           │ city       │   │
+                           │ district   │   │
+                           │ ward       │   │
+                           │ note       │   │
+                           │ subtotal   │   │
+                           │ shipping_fee│  │
+                           │ tax        │   │
+                           │ total_amount│  │
+                           │ order_date │   │
+                           │ status     │   │
+                           │ created_at │   │
+                           │ updated_at │   │
+                           └────────────┘   │
+                                 │          ↓
+                           1:1   │     ┌─────────────┐
+                                 │     │order_details│
+                                 │     │─────────────│
+                                 │     │order_detail_id PK│
+                                 │     │order_id FK  │
+                                 │     │car_id FK    │
+                                 │     │quantity     │
+                                 │     │price        │
+                                 │     └─────────────┘
+                                 ↓           ↑
+                           ┌────────────┐    │ N:1
+                           │  payment   │    │
+                           │────────────│    │
+                           │payment_id PK│   │
+                           │order_id FK UK│  │
+                           │payment_date│    │
+                           │amount      │    │
+                           │payment_method│  │
+                           │status      │    │
+                           │transaction_id│  │
+                           │created_at  │    │
+                           │updated_at  │    │
+                           └────────────┘    │
+                                             │
+┌─────────────────┐                         │
+│ car_categories  │                         │
+│─────────────────│                         │
+│ category_id PK  │───┐                     │
+│ category_name UK│   │                     │
+└─────────────────┘   │                     │
+                      │ N:1                 │
+┌──────────────┐      │                     │
+│  car_brands  │      │                     │
+│──────────────│      │                     │
+│ brand_id PK  │──┐   │                     │
+│ brand_name UK│  │   │                     │
+└──────────────┘  │   │                     │
+                  │ N:1 (⚠️ Now using enums)│
+                  ↓   ↓                     │
+              ┌────────────┐                │
+              │    cars    │────────────────┘
               │────────────│
               │ car_id PK  │───┐
-              │ category_id FK │ │ 1:1
-              │ brand_id FK │   │
-              │ model       │   │
+              │ brand ENUM │   │ 1:1
+              │ category ENUM│ │
+              │ model       │  │
               │ manufacture_year│
-              │ price       │   │
-              │ color       │   │
-              │ description │   │
-              │ status      │   │
-              │ image_url   │   │
-              └────────────┘   │
-                               ↓
-                          ┌──────────────┐
-                          │ car_details  │
-                          │──────────────│
-                          │ car_detail_id PK │
-                          │ car_id FK UK │
-                          │ engine       │
-                          │ horsepower   │
-                          │ torque       │
-                          │ transmission │
-                          │ fuel_type    │
-                          │ fuel_consumption │
-                          │ seats        │
-                          │ weight       │
-                          │ dimensions   │
-                          └──────────────┘
+              │ price       │  │
+              │ color       │  │
+              │ description │  │
+              │ status      │  │
+              │ image_url   │  │
+              └────────────┘  │
+                              ↓
+                         ┌──────────────┐
+                         │ car_details  │
+                         │──────────────│
+                         │ car_detail_id PK │
+                         │ car_id FK UK │
+                         │ engine       │
+                         │ horsepower   │
+                         │ torque       │
+                         │ transmission │
+                         │ fuel_type    │
+                         │ fuel_consumption │
+                         │ seats        │
+                         │ weight       │
+                         │ dimensions   │
+                         └──────────────┘
 ```
 
 ### Entity Details
@@ -317,26 +403,32 @@ Account is fetched eagerly (default for @OneToOne) to support the consolidated A
 - Auto-generated random ID (100000 + random 900000)
 - Examples: Toyota, Honda, BMW, Mercedes, etc.
 
-#### 5. cars (Car Inventory)
+#### 5. cars (Car Inventory) ⚠️ UPDATED
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | car_id | BIGINT | PK | Random 6-digit ID |
-| category_id | BIGINT | FK, NOT NULL | Reference to car_categories |
-| brand_id | BIGINT | FK, NOT NULL | Reference to car_brands |
+| brand | ENUM | NOT NULL | Brand enum (TOYOTA, HYUNDAI, MERCEDES, VINFAST) |
+| category | ENUM | NOT NULL | Category enum (SUV, SEDAN, HATCHBACK) |
 | model | VARCHAR(50) | NOT NULL | Car model name |
 | manufacture_year | INT | NOT NULL | Year of manufacture |
 | price | DECIMAL(15,3) | NOT NULL | Car price |
-| color | VARCHAR(30) | | Car color |
+| color | ENUM | | Car color (enum) |
 | description | TEXT | | Car description |
 | status | ENUM | | AVAILABLE/SOLD |
 | image_url | VARCHAR(255) | | Car image URL |
 
-**Relationships:**
-- Many-to-one with CarCategory (LAZY fetch)
-- Many-to-one with CarBrand (LAZY fetch)
+**⚠️ IMPORTANT CHANGE:**
+- **Previously:** Used foreign keys to CarBrand and CarCategory entities (brand_id, category_id)
+- **Now:** Uses enum fields (brand, category) - Brand and Category are no longer entity relationships
+- **Migration Required:** Old brand_id and category_id columns must be manually dropped from database
 
 **Enums:**
+- **Brand:** TOYOTA, HYUNDAI, MERCEDES, VINFAST
+- **Category:** SUV, SEDAN, HATCHBACK
 - **CarStatus:** AVAILABLE, SOLD
+
+**Relationships:**
+- One-to-many with OrderDetail (LAZY fetch)
 
 #### 6. car_details (Detailed Car Specifications)
 | Column | Type | Constraints | Description |
@@ -356,6 +448,90 @@ Account is fetched eagerly (default for @OneToOne) to support the consolidated A
 **Relationships:**
 - One-to-one with Car (LAZY fetch)
 - Foreign key: fk_car_details_car
+
+#### 7. orders (Order Management) 🆕 NEW
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| order_id | VARCHAR(36) | PK | Auto-generated UUID |
+| user_id | VARCHAR(36) | FK, NOT NULL | Reference to users |
+| full_name | VARCHAR(100) | NOT NULL | Customer full name (snapshot) |
+| email | VARCHAR(100) | NOT NULL | Customer email (snapshot) |
+| phone | VARCHAR(20) | NOT NULL | Customer phone (snapshot) |
+| address | VARCHAR(255) | NOT NULL | Shipping address |
+| city | VARCHAR(50) | | City |
+| district | VARCHAR(50) | | District |
+| ward | VARCHAR(50) | | Ward |
+| note | TEXT | | Order notes |
+| subtotal | DECIMAL(15,2) | NOT NULL | Sum of order items |
+| shipping_fee | DECIMAL(10,2) | NOT NULL | Shipping cost (default 0) |
+| tax | DECIMAL(10,2) | NOT NULL | Tax amount (default 0) |
+| total_amount | DECIMAL(15,2) | NOT NULL | Final total amount |
+| order_date | DATETIME | NOT NULL | Order date/time |
+| status | ENUM | NOT NULL | Order status |
+| cancel_reason | VARCHAR(255) | | Reason for cancellation |
+| created_at | DATETIME | NOT NULL | Auto-set on creation |
+| updated_at | DATETIME | NOT NULL | Auto-updated on modification |
+
+**Enums:**
+- **OrderStatus:** PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED, COMPLETED
+
+**Relationships:**
+- Many-to-one with User (LAZY fetch)
+- One-to-many with OrderDetail (CASCADE ALL, orphanRemoval)
+- One-to-one with Payment (CASCADE ALL)
+
+**Features:**
+- UUID-based primary key
+- @PrePersist sets default values (UUID, orderDate, status=PENDING, fees=0)
+- Shipping information is a snapshot (not a reference to user profile)
+- Financial breakdown: subtotal + shipping_fee + tax = total_amount
+
+#### 8. order_details (Order Line Items) 🆕 NEW
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| order_detail_id | BIGINT | PK | Auto-increment ID |
+| order_id | VARCHAR(36) | FK, NOT NULL | Reference to orders |
+| car_id | BIGINT | FK, NOT NULL | Reference to cars |
+| color_name | ENUM | | Color of the car (snapshot) |
+| quantity | INT | NOT NULL | Item quantity (default 1) |
+| price | DECIMAL(15,2) | NOT NULL | Car price at order time (snapshot) |
+
+**Relationships:**
+- Many-to-one with Order (LAZY fetch)
+- Many-to-one with Car (LAZY fetch)
+
+**Features:**
+- Price is a snapshot at order time (not a live reference to car.price)
+- @PrePersist sets default quantity to 1
+- CASCADE delete when order is deleted
+- Foreign key: fk_order_details_order, fk_order_details_car
+
+#### 9. payment (Payment Records) 🆕 NEW
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| payment_id | VARCHAR(36) | PK | Auto-generated UUID |
+| order_id | VARCHAR(36) | FK, UK, NOT NULL | One-to-one with orders |
+| payment_date | DATETIME | | Date of successful payment |
+| amount | DECIMAL(15,2) | NOT NULL | Payment amount |
+| payment_method | ENUM | NOT NULL | Payment method |
+| status | ENUM | NOT NULL | Payment status |
+| transaction_id | VARCHAR(255) | | External payment gateway transaction ID |
+| created_at | DATETIME | NOT NULL | Auto-set on creation |
+| updated_at | DATETIME | NOT NULL | Auto-updated on modification |
+
+**Enums:**
+- **PaymentMethod:** CASH, CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, VNPAY, MOMO
+- **PaymentStatus:** PENDING, SUCCESS, FAILED
+
+**Relationships:**
+- One-to-one with Order (LAZY fetch, unique constraint)
+
+**Features:**
+- UUID-based primary key
+- @PrePersist sets default status to PENDING
+- payment_date is set when status becomes SUCCESS
+- Supports Vietnamese payment gateways (VNPAY, MOMO)
+- Foreign key: fk_payment_order
 
 ---
 
@@ -498,28 +674,32 @@ AccountController is deprecated. Use UserController instead. Account information
 
 ---
 
-### Car Management (CarController)
+### Car Management (CarController) ⚠️ UPDATED
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | /api/cars | Get all cars | Public |
-| POST | /api/cars | Create new car | Admin |
+| POST | /api/cars | Create new car with Brand/Category enums | Admin |
 | GET | /api/cars/{carId} | Get car detail | Public |
-| PUT | /api/cars/{carId} | Update car | Admin |
+| PUT | /api/cars/{carId} | Update car with Brand/Category enums | Admin |
 | DELETE | /api/cars/{carId} | Delete car | Admin |
-| GET | /api/cars/category/{categoryId} | Get cars by category | Public |
-| GET | /api/cars/brand/{brandId} | Get cars by brand | Public |
+| GET | /api/cars/category/{category} | Get cars by Category enum (SUV, SEDAN, HATCHBACK) | Public |
+| GET | /api/cars/brand/{brand} | Get cars by Brand enum (TOYOTA, HYUNDAI, MERCEDES, VINFAST) | Public |
 | GET | /api/cars/image/{filename} | Get car image | Public |
 
 **Request/Response Models:**
-- **CarRequest:** { brandId, categoryId, model, manufactureYear, price, color, description, status, imageFile }
-- **CarResponse:** { carId, brandId, categoryId, model, manufactureYear, price, color, description, status, imageUrl }
+- **CarRequest:** { brand (ENUM), category (ENUM), model, manufactureYear, price, color, description, status, imageFile }
+- **CarResponse:** { carId, brand (ENUM), category (ENUM), model, manufactureYear, price, color, description, status, imageUrl }
+- **Brand Enum:** TOYOTA, HYUNDAI, MERCEDES, VINFAST
+- **Category Enum:** SUV, SEDAN, HATCHBACK
 - **CarStatus Enum:** AVAILABLE, SOLD
 
 **Features:**
+- ⚠️ **BREAKING CHANGE:** Now uses enum path variables instead of IDs
 - Multipart form data support for car image upload
-- Filter by category or brand
+- Filter by category enum or brand enum
 - Image serving endpoint
+- @Valid annotation for validation
 
 ---
 
@@ -571,6 +751,82 @@ AccountController is deprecated. Use UserController instead. Account information
 
 ---
 
+### Order Management (OrderController) 🆕 NEW
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | /api/orders | Create new order with order details and payment | User/Admin |
+| GET | /api/orders | Get all orders | User/Admin |
+| GET | /api/orders/{orderId} | Get order detail by order ID | User/Admin |
+| GET | /api/orders/user/{userId} | Get all orders by user ID | User/Admin |
+| GET | /api/orders/status/{status} | Get orders by status (PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED, COMPLETED) | User/Admin |
+| PATCH | /api/orders/{orderId}/status | Update order status | User/Admin |
+| DELETE | /api/orders/{orderId} | Delete order | User/Admin |
+
+**Request/Response Models:**
+- **OrderRequest:** { userId, fullName, email, phone, address, city, district, ward, note, shippingFee, tax, paymentMethod, orderDetails[] }
+- **OrderResponse:** { orderId, userId, fullName, email, phone, address, city, district, ward, note, subtotal, shippingFee, tax, totalAmount, orderDate, status, createdAt, updatedAt, orderDetails[], payment }
+- **OrderStatus Enum:** PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED, COMPLETED
+
+**Features:**
+- **Atomic transaction:** Creates order, order details, and payment in a single request
+- **Auto-calculation:** Subtotal and total amount calculated from order details
+- **Price snapshot:** Car prices are captured at order time
+- **Validation:** Validates user existence and car availability
+- **@Valid annotation:** Request body validation
+- **Status tracking:** Update order status independently
+
+---
+
+### Order Detail Management (OrderDetailController) 🆕 NEW
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | /api/order-details | Get all order details | User/Admin |
+| GET | /api/order-details/{orderDetailId} | Get order detail by ID | User/Admin |
+| GET | /api/order-details/order/{orderId} | Get all order details by order ID | User/Admin |
+| DELETE | /api/order-details/{orderDetailId} | Delete order detail | User/Admin |
+
+**Request/Response Models:**
+- **OrderDetailRequest:** { carId, quantity }
+- **OrderDetailResponse:** { orderDetailId, carId, carModel, quantity, price, subtotal }
+- **Subtotal calculation:** price × quantity
+
+**Features:**
+- **Car information:** Includes car model in response
+- **Subtotal calculation:** Auto-calculated in response
+- **Validation:** Ensures quantity is at least 1
+- **Read operations:** Primarily for viewing order details
+
+---
+
+### Payment Management (PaymentController) 🆕 NEW
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | /api/payments | Create new payment for an order | User/Admin |
+| GET | /api/payments | Get all payments | User/Admin |
+| GET | /api/payments/{paymentId} | Get payment detail by payment ID | User/Admin |
+| GET | /api/payments/order/{orderId} | Get payment by order ID | User/Admin |
+| GET | /api/payments/status/{status} | Get payments by status (PENDING, SUCCESS, FAILED) | User/Admin |
+| PATCH | /api/payments/{paymentId}/status | Update payment status | User/Admin |
+| DELETE | /api/payments/{paymentId} | Delete payment | User/Admin |
+
+**Request/Response Models:**
+- **PaymentRequest:** { orderId, paymentDate, amount, paymentMethod, status, transactionId }
+- **PaymentResponse:** { paymentId, orderId, paymentDate, amount, paymentMethod, status, transactionId, createdAt, updatedAt }
+- **PaymentMethod Enum:** CASH, CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, VNPAY, MOMO
+- **PaymentStatus Enum:** PENDING, SUCCESS, FAILED
+
+**Features:**
+- **Vietnamese payment gateways:** Supports VNPAY and MOMO
+- **Transaction tracking:** External transaction ID support
+- **Auto payment date:** Sets payment_date when status becomes SUCCESS
+- **Status management:** Update payment status independently
+- **Validation:** Ensures order exists before creating payment
+
+---
+
 ### API Response Format
 
 All API responses follow a consistent format using **ApiResponse<T>** wrapper:
@@ -617,13 +873,16 @@ All API responses follow a consistent format using **ApiResponse<T>** wrapper:
 - ✅ Password BCrypt encoding on creation/update
 - ⚠️ **AccountController deprecated** - Use UserController instead
 
-### 3. Car Inventory Management
+### 3. Car Inventory Management (⚠️ UPDATED - Enum Migration)
 - ✅ Complete CRUD operations for cars
 - ✅ Car image upload and serving
 - ✅ Car status tracking (AVAILABLE/SOLD)
-- ✅ Filter cars by brand
-- ✅ Filter cars by category
+- ✅ **NEW: Brand enum** (TOYOTA, HYUNDAI, MERCEDES, VINFAST) - replaces CarBrand entity
+- ✅ **NEW: Category enum** (SUV, SEDAN, HATCHBACK) - replaces CarCategory entity
+- ✅ Filter cars by brand enum
+- ✅ Filter cars by category enum
 - ✅ Auto-generated car IDs
+- ⚠️ **BREAKING CHANGE:** Brand/Category now stored as enums, not entity relationships
 
 ### 4. Car Brand Management
 - ✅ Manage car brands (Toyota, Honda, etc.)
@@ -644,41 +903,71 @@ All API responses follow a consistent format using **ApiResponse<T>** wrapper:
 - ✅ Seating capacity
 - ✅ One-to-one relationship with car
 
-### 7. File Upload
+### 7. Order Management System 🆕 NEW
+- ✅ **Complete order lifecycle management**
+- ✅ **Order creation** with multiple items in single transaction
+- ✅ **Auto-calculation** of subtotal, tax, shipping, and total amount
+- ✅ **Order status tracking** (PENDING → CONFIRMED → SHIPPING → DELIVERED → COMPLETED)
+- ✅ **Order cancellation** support (CANCELLED status)
+- ✅ **User order history** - View all orders by user
+- ✅ **Filter by status** - Track orders by their current status
+- ✅ **Shipping information snapshot** - Captures customer details at order time
+- ✅ **UUID-based order IDs** for security and uniqueness
+
+### 8. Order Details Management 🆕 NEW
+- ✅ **Line item management** for orders
+- ✅ **Price snapshot** - Captures car price at order time
+- ✅ **Quantity management** with validation
+- ✅ **Subtotal calculation** per line item
+- ✅ **Car information** included in response
+- ✅ **Cascade delete** with parent order
+
+### 9. Payment Management 🆕 NEW
+- ✅ **Multiple payment methods** (Cash, Cards, Bank Transfer, VNPAY, MOMO)
+- ✅ **Vietnamese payment gateway support** (VNPAY, MOMO)
+- ✅ **Payment status tracking** (PENDING, SUCCESS, FAILED)
+- ✅ **Transaction ID tracking** for external payment gateways
+- ✅ **Auto payment date** - Sets when payment succeeds
+- ✅ **One-to-one relationship** with orders
+- ✅ **Payment history** - View all payments by status
+
+### 10. File Upload
 - ✅ Image upload for cars (multipart/form-data)
 - ✅ Avatar upload for users (multipart/form-data)
 - ✅ File size limit: 10MB
 - ✅ Image serving endpoints
 
-### 8. API Documentation
+### 11. API Documentation
 - ✅ Swagger UI integration
 - ✅ OpenAPI 3.1.0 specification
 - ✅ Interactive API testing
 - ✅ Accessible at: /swagger-ui/index.html
 
-### 9. Error Handling
+### 12. Error Handling
 - ✅ Global exception handler
 - ✅ Custom exception types (AppException, BadRequestException, DuplicateKeyException)
 - ✅ Standardized error responses
 - ✅ ErrorCode enumeration
+- ✅ **NEW error codes:** ORDER_NOT_FOUND, ORDER_DETAIL_NOT_FOUND, PAYMENT_NOT_FOUND, ORDER_CANNOT_BE_CANCELLED, NEWS_NOT_FOUND, PROMOTION_NOT_FOUND
 
-### 10. Data Validation
+### 13. Data Validation
 - ✅ Bean validation with javax.validation
 - ✅ Unique constraint enforcement
 - ✅ Not null validation
 - ✅ Custom business logic validation
 
-### 11. CORS Support
+### 14. CORS Support
 - ✅ Custom CORS configuration
 - ✅ Configurable allowed origins
 - ✅ Debug logging enabled
 
-### 12. Database Features
+### 15. Database Features
 - ✅ Auto table creation/update (ddl-auto=update)
 - ✅ SQL logging enabled
 - ✅ Formatted SQL output
 - ✅ JPA lifecycle callbacks (@PrePersist, @PreUpdate)
 - ✅ Lazy loading for relationships
+- ✅ **NEW:** Enum support with @Enumerated(EnumType.STRING)
 
 ---
 
@@ -790,10 +1079,11 @@ oto-shop/
 
 ### Key Files Count
 
-- **Controllers:** 7 (Account, Auth, Car, CarBrand, CarCategory, CarDetail, User)
-- **Services:** 7 (matching controllers)
-- **Repositories:** 6 (Account, Car, CarBrand, CarCategory, CarDetail, User)
-- **Entities:** 6 (Account, Car, CarBrand, CarCategory, CarDetail, User)
+- **Controllers:** 10 (Account⚠️, Auth, Car⚠️, CarBrand, CarCategory, CarDetail, User, Order🆕, OrderDetail🆕, Payment🆕)
+- **Services:** 10 (matching controllers + OrderService, OrderDetailService, PaymentService)
+- **Repositories:** 9 (Account, Car, CarBrand, CarCategory, CarDetail, User, Order🆕, OrderDetail🆕, Payment🆕)
+- **Entities:** 9 (Account, Car⚠️, CarBrand, CarCategory, CarDetail, User, Order🆕, OrderDetail🆕, Payment🆕)
+- **Enums:** 9 (AccountStatus, Brand🆕, CarStatus, Category🆕, Gender, OrderStatus🆕, PaymentMethod🆕, PaymentStatus🆕, Role)
 - **Configuration Classes:** 7 (ApplicationInit, CORS, JWT, Password, Security, Swagger, Web)
 - **Security Components:** Custom UserDetailsService, JWT Filter, Exception Handlers
 
@@ -840,21 +1130,40 @@ mvn spring-boot:run
 
 ## 📊 API Endpoints Summary
 
-### Total Endpoints: 40+
+### Total Endpoints: 70+
 
-| Controller | GET | POST | PUT | DELETE | Total | Status |
-|------------|-----|------|-----|--------|-------|--------|
+| Controller | GET | POST | PUT/PATCH | DELETE | Total | Status |
+|------------|-----|------|-----------|--------|-------|--------|
 | AuthController | 0 | 3 | 0 | 0 | 3 | Active |
 | AccountController | 2 | 1 | 1 | 1 | 5 | ⚠️ Deprecated |
 | UserController | 4 | 2 | 1 | 1 | 8 | Active ⭐ Updated |
-| CarController | 5 | 1 | 1 | 1 | 8 | Active |
+| CarController | 5 | 1 | 1 | 1 | 8 | Active ⚠️ Updated (Enums) |
 | CarBrandController | 2 | 1 | 1 | 1 | 5 | Active |
 | CarCategoryController | 2 | 1 | 1 | 1 | 5 | Active |
 | CarDetailController | 2 | 1 | 1 | 1 | 5 | Active |
+| OrderController 🆕 | 5 | 2 | 1 | 1 | 9 | Active ⭐ Updated |
+| OrderDetailController 🆕 | 3 | 0 | 0 | 1 | 4 | Active NEW |
+| PaymentController 🆕 | 5 | 3 | 1 | 1 | 10 | Active ⭐ Updated |
+| NewsController 🆕 | 2 | 1 | 1 | 1 | 5 | Active NEW |
+| PromotionController 🆕 | 1 | 1 | 1 | 1 | 4 | Active NEW |
+| SearchController 🆕 | 1 | 0 | 0 | 0 | 1 | Active NEW |
+| CompareController 🆕 | 1 | 0 | 0 | 0 | 1 | Active NEW |
+| AdminDashboardController 🆕 | 3 | 0 | 0 | 0 | 3 | Active NEW |
+| HomeController 🆕 | 1 | 0 | 0 | 0 | 1 | Active NEW |
 
 **Recent Changes:**
+- 🆕 **OrderController added:** Complete order management (9 endpoints), including order cancellation.
+- 🆕 **OrderDetailController added:** Order line items management (4 endpoints)
+- 🆕 **PaymentController added:** Payment processing (10 endpoints), including payment confirmation and failure marking.
+- ⚠️ **CarController updated:** Now uses Brand/Category enums instead of IDs (BREAKING CHANGE)
 - ⭐ UserController expanded with 2 new endpoints (create-with-account, username lookup)
 - ⚠️ AccountController marked as deprecated (functionality moved to UserController)
+- 🆕 **NewsController added:** News management (5 endpoints)
+- 🆕 **PromotionController added:** Promotion management (4 endpoints)
+- 🆕 **SearchController added:** Car search endpoint
+- 🆕 **CompareController added:** Car comparison endpoint
+- 🆕 **AdminDashboardController added:** Admin dashboard statistics endpoints
+- 🆕 **HomeController added:** Home page sections endpoint
 
 ---
 
@@ -902,7 +1211,7 @@ This is a **well-structured Spring Boot application** following best practices:
 ✅ **Configuration Management** - Externalized configuration with profiles
 ✅ **Code Quality** - Use of Lombok and MapStruct for cleaner code
 
-### Recent Updates (October 8, 2025)
+### Recent Updates (October 9, 2025)
 
 #### ⭐ User & Account API Consolidation
 - **Consolidated User + Account information** in single API responses (1:1 relationship)
@@ -930,11 +1239,110 @@ This is a **well-structured Spring Boot application** following best practices:
 
 ---
 
+### Recent Updates (October 9, 2025)
+
+#### 🆕 Order Management System Implementation
+**Complete order processing system with full CRUD functionality**
+
+**New Entities:**
+- `Order.java` - Main order entity with shipping information snapshot
+- `OrderDetail.java` - Order line items with price snapshots
+- `Payment.java` - Payment records with Vietnamese gateway support
+
+**New Enums:**
+- `OrderStatus` - PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED, COMPLETED
+- `PaymentMethod` - CASH, CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, VNPAY, MOMO
+- `PaymentStatus` - PENDING, SUCCESS, FAILED
+
+**New Controllers & APIs:**
+- `OrderController` - 8 endpoints for complete order lifecycle management
+- `OrderDetailController` - 4 endpoints for order line items
+- `PaymentController` - 8 endpoints for payment processing
+
+**New Services:**
+- `OrderService` - Order creation with auto-calculation (subtotal, tax, shipping, total)
+- `OrderDetailService` - Line item management with price snapshots
+- `PaymentService` - Payment processing with status tracking
+
+**New Repositories:**
+- `OrderRepository` - findByUser_UserId, findByStatus
+- `OrderDetailRepository` - findByOrder_OrderId
+- `PaymentRepository` - findByOrder_OrderId, findByStatus
+
+**New DTOs (6 total):**
+- OrderRequest/Response, OrderDetailRequest/Response, PaymentRequest/Response
+
+**New Mappers (3 total):**
+- OrderMapper, OrderDetailMapper, PaymentMapper
+
+**New Error Codes:**
+- ORDER_NOT_FOUND, ORDER_DETAIL_NOT_FOUND, PAYMENT_NOT_FOUND
+
+**Database Schema:**
+- `database_order_system.sql` - Complete SQL schema with proper constraints and indexes
+
+**Features:**
+- ✅ Atomic order creation (order + details + payment in single transaction)
+- ✅ Auto-calculation of subtotal, tax, shipping, and total amount
+- ✅ Price snapshot at order time (immutable pricing)
+- ✅ Order status lifecycle tracking
+- ✅ User order history
+- ✅ Vietnamese payment gateway support (VNPAY, MOMO)
+- ✅ Transaction ID tracking for external gateways
+- ✅ UUID-based order and payment IDs for security
+
+---
+
+#### ⚠️ Car Brand/Category Enum Migration (BREAKING CHANGE)
+**Migrated from entity relationships to enum fields**
+
+**Changes:**
+- `Brand.java` enum - TOYOTA, HYUNDAI, MERCEDES, VINFAST (replaces CarBrand entity relationship)
+- `Category.java` enum - SUV, SEDAN, HATCHBACK (replaces CarCategory entity relationship)
+- `Car.java` entity - Now uses @Enumerated enum fields instead of @ManyToOne relationships
+- `CarController` - Updated to accept enum path variables (e.g., `/api/cars/brand/TOYOTA`)
+- `CarRepository` - Updated methods: findAllByBrand(Brand), findAllByCategory(Category)
+- `CarService` - Removed CarBrandRepository and CarCategoryRepository dependencies
+- `CarBrandService` & `CarCategoryService` - Removed car deletion logic (cars now independent)
+
+**Breaking Changes:**
+- ⚠️ **API Endpoints Changed:**
+  - OLD: `GET /api/cars/brand/{brandId}` (numeric ID)
+  - NEW: `GET /api/cars/brand/{brand}` (enum value: TOYOTA, HYUNDAI, etc.)
+  - OLD: `GET /api/cars/category/{categoryId}` (numeric ID)
+  - NEW: `GET /api/cars/category/{category}` (enum value: SUV, SEDAN, HATCHBACK)
+
+- ⚠️ **DTO Changes:**
+  - CarRequest: brandId/categoryId (Long) → brand/category (Enum)
+  - CarResponse: brandId/categoryId (Long) → brand/category (Enum)
+
+**Database Migration Required:**
+```sql
+-- ⚠️ MANUAL MIGRATION REQUIRED
+-- File: fix_car_table.sql
+ALTER TABLE cars DROP FOREIGN KEY IF EXISTS fk_cars_brand;
+ALTER TABLE cars DROP FOREIGN KEY IF EXISTS fk_cars_category;
+ALTER TABLE cars DROP COLUMN IF EXISTS brand_id;
+ALTER TABLE cars DROP COLUMN IF EXISTS category_id;
+```
+
+**Benefits:**
+- ✅ Simpler data model (fewer joins)
+- ✅ Better performance (no entity relationships)
+- ✅ Type-safe enum values
+- ✅ Fixed brand/category list (no dynamic changes needed)
+
+**⚠️ Important:**
+- Old brand_id and category_id columns must be manually dropped before using the updated Car APIs
+- CarBrand and CarCategory entities remain for legacy brand/category management
+- Cars are now independent of brand/category entities
+
+---
+
 ### Potential Enhancements
 - Add pagination for list endpoints
 - Implement search/filter functionality
 - Add caching layer (Redis)
-- Implement order and payment functionality (as planned in README)
 - Add unit and integration tests
 - Add API rate limiting
 - Implement audit logging
@@ -942,10 +1350,13 @@ This is a **well-structured Spring Boot application** following best practices:
 - Implement soft delete instead of hard delete
 - Add API versioning
 - Complete removal of deprecated AccountController in future version
+- Add order cancellation workflow
+- Add payment gateway webhook integration
+- Add inventory management (stock tracking)
 
 ---
 
-**Generated:** October 8, 2025
-**Last Updated:** October 8, 2025 (Added User/Account Consolidation)
+**Generated:** October 9, 2025
+**Last Updated:** October 9, 2025
 **Contact:** congphamdz2004@gmail.com
 **Project Version:** 0.0.1-SNAPSHOT

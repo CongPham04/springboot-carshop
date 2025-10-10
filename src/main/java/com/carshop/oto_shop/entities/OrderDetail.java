@@ -1,5 +1,6 @@
 package com.carshop.oto_shop.entities;
 
+import com.carshop.oto_shop.enums.Color;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -21,6 +22,10 @@ public class OrderDetail {
     @JoinColumn(name = "car_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_order_details_car"))
     private Car car;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "color_name", length = 30)
+    private Color colorName;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -62,6 +67,14 @@ public class OrderDetail {
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public Color getColorName() {
+        return colorName;
+    }
+
+    public void setColorName(Color colorName) {
+        this.colorName = colorName;
     }
 
     public Integer getQuantity() {

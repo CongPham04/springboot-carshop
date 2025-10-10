@@ -67,6 +67,23 @@ public class PaymentController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái thanh toán thành công!", paymentResponse));
     }
 
+    @Operation(summary = "Confirm payment", description = "API to confirm a payment was successful")
+    @PostMapping("/{paymentId}/confirm")
+    public ResponseEntity<ApiResponse<PaymentResponse>> confirmPayment(@PathVariable String paymentId) {
+        // This service call should set the payment status to SUCCESS
+        // and trigger the associated order's status to be updated to CONFIRMED.
+        PaymentResponse paymentResponse = paymentService.confirmPayment(paymentId);
+        return ResponseEntity.ok(ApiResponse.success("Xác nhận thanh toán thành công!", paymentResponse));
+    }
+
+    @Operation(summary = "Fail payment", description = "API to mark a payment as failed")
+    @PostMapping("/{paymentId}/fail")
+    public ResponseEntity<ApiResponse<PaymentResponse>> failPayment(@PathVariable String paymentId) {
+        // This service call should set the payment status to FAILED.
+        PaymentResponse paymentResponse = paymentService.failPayment(paymentId);
+        return ResponseEntity.ok(ApiResponse.success("Đánh dấu thanh toán thất bại!", paymentResponse));
+    }
+
     @Operation(summary = "Delete payment", description = "API delete payment")
     @DeleteMapping("/{paymentId}")
     public ResponseEntity<ApiResponse<Void>> deletePayment(@PathVariable String paymentId) {

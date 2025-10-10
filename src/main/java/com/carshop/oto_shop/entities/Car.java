@@ -3,15 +3,14 @@ package com.carshop.oto_shop.entities;
 import com.carshop.oto_shop.enums.Brand;
 import com.carshop.oto_shop.enums.CarStatus;
 import com.carshop.oto_shop.enums.Category;
+import com.carshop.oto_shop.enums.Color;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Random;
 
 @Entity
-@Table(
-        name = "cars"
-)
+@Table(name = "cars")
 public class Car {
     @Id
     @Column(name = "car_id", nullable = false, updatable = false)
@@ -34,8 +33,9 @@ public class Car {
     @Column(name = "price", nullable = false, precision = 15, scale = 3)
     private BigDecimal price;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "color", length = 30)
-    private String color;
+    private Color color;
 
     @Column(name = "description")
     private String description;
@@ -46,6 +46,7 @@ public class Car {
 
     @Column(name = "image_url", length = 255)
     private String imageUrl;
+
     @PrePersist
     public void generateAuto(){
         if(this.status == null){
@@ -58,8 +59,9 @@ public class Car {
     }
 
     public Car() {
-
     }
+
+    // Getters and Setters
 
     public Long getCarId() {
         return carId;
@@ -109,11 +111,11 @@ public class Car {
         this.price = price;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
