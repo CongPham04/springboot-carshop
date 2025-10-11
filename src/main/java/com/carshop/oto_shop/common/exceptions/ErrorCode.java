@@ -26,7 +26,8 @@ public enum ErrorCode {
     ORDER_CANNOT_BE_CANCELLED("ORDER_CANNOT_BE_CANCELLED", "Đơn hàng không thể hủy!", HttpStatus.BAD_REQUEST),
     NEWS_NOT_FOUND("NEWS_NOT_FOUND", "Tin tức không tồn tại!", HttpStatus.NOT_FOUND),
     PROMOTION_NOT_FOUND("PROMOTION_NOT_FOUND", "Khuyến mãi không tồn tại!", HttpStatus.NOT_FOUND),
-    PAYMENT_NOT_FOUND("PAYMENT_NOT_FOUND", "Thanh toán không tồn tại!", HttpStatus.NOT_FOUND);
+    PAYMENT_NOT_FOUND("PAYMENT_NOT_FOUND", "Thanh toán không tồn tại!", HttpStatus.NOT_FOUND),
+    VALIDATION_FAILED("VALIDATION_FAILED", "Dữ liệu nhập không hợp lệ", HttpStatus.BAD_REQUEST);
     private final String code;
     private final String message;
     private final HttpStatus httpStatus;

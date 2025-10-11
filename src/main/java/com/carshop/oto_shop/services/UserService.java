@@ -143,7 +143,7 @@ public class UserService {
      * @return Updated UserResponse with full information
      */
     @Transactional
-    public UserResponse updateUserWithAccount(UserUpdateRequest request, String userId) {
+    public void updateUserWithAccount(UserUpdateRequest request, String userId) {
         try {
             // Find user with account
             User user = userRepository.findById(userId)
@@ -176,9 +176,7 @@ public class UserService {
                 account.setEmail(request.getEmail());
             }
             if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-                // Encode password before saving
                 account.setPassword(passwordEncoder.encode(request.getPassword()));
-                logger.info("Password updated for account {}", account.getAccountId());
             }
             if (request.getRole() != null) {
                 account.setRole(request.getRole());
@@ -186,22 +184,15 @@ public class UserService {
             if (request.getStatus() != null) {
                 account.setStatus(request.getStatus());
             }
-
-            // Save both (cascade or explicit)
+            if (request.getAvatarFile() != null && !request.getAvatarFile().isEmpty()) {
+                deleteAvatarFile(user.getAvatarUrl());
+                String newAvatarUrl = saveAvatar(request.getAvatarFile());
+                user.setAvatarUrl(newAvatarUrl);
+            }
             accountRepository.save(account);
             User savedUser = userRepository.save(user);
 
-            logger.info("Updated user {} with account {}", userId, account.getAccountId());
-
-            // Build response
-            UserResponse response = userMapper.toUserResponse(savedUser);
-            if (savedUser.getAvatarUrl() != null) {
-                String fileName = Paths.get(savedUser.getAvatarUrl()).getFileName().toString();
-                response.setAvatarUrl(BASE_IMAGE_URL + fileName);
-            }
-
-            return response;
-
+            userMapper.toUserResponse(savedUser);
         } catch (DataIntegrityViolationException e) {
             String message = e.getMostSpecificCause().getMessage();
             logger.error("DataIntegrityViolationException caught: {}", message);

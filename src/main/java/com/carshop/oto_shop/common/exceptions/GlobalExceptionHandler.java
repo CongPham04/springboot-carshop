@@ -6,12 +6,16 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -98,6 +102,31 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorResponse.getStatus())
                 .body(errorResponse);
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> validationErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> Map.of(
+                        "field", error.getField(),
+                        "message", error.getDefaultMessage()
+                ))
+                .collect(Collectors.toList());
+
+        String combinedMessage = validationErrors.stream()
+                .map(err -> err.get("field") + ": " + err.get("message"))
+                .collect(Collectors.joining("; "));
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorCode(ErrorCode.VALIDATION_FAILED.getCode());
+        errorResponse.setMessage(combinedMessage);
+        errorResponse.setStatus(ErrorCode.VALIDATION_FAILED.getHttpStatus().value());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setErrors(validationErrors);
+
+        return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(value = DisabledException.class)

@@ -4,6 +4,7 @@ import com.carshop.oto_shop.enums.AccountStatus;
 import com.carshop.oto_shop.enums.Gender;
 import com.carshop.oto_shop.enums.Role;
 import jakarta.validation.constraints.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -42,14 +43,10 @@ public class UserUpdateRequest {
 
     private AccountStatus status;
 
-    // Note: Username is not included for security reasons (cannot be changed)
-
-    // ==================== Constructors ====================
+    private MultipartFile avatarFile;
 
     public UserUpdateRequest() {
     }
-
-    // ==================== Getters and Setters ====================
 
     public String getFullName() {
         return fullName;
@@ -121,5 +118,13 @@ public class UserUpdateRequest {
 
     public void setStatus(AccountStatus status) {
         this.status = status;
+    }
+
+    public MultipartFile getAvatarFile() {
+        return avatarFile;
+    }
+
+    public void setAvatarFile(MultipartFile avatarFile) {
+        this.avatarFile = avatarFile;
     }
 }

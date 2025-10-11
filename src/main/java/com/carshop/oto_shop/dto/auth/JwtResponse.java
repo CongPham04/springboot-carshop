@@ -3,7 +3,6 @@ package com.carshop.oto_shop.dto.auth;
 public class JwtResponse {
     private String token;
     private String refreshToken;
-
     public JwtResponse(String token, String refreshToken) {
         this.token = token;
         this.refreshToken = refreshToken;
@@ -20,7 +19,6 @@ public class JwtResponse {
     public String getRefreshToken() {
         return refreshToken;
     }
-
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

@@ -57,13 +57,16 @@ public class AuthService {
     }
 
     public JwtResponse refreshToken(String refreshToken) {
-        if (jwtTokenProvider.validateToken(refreshToken)) {
-            String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
-            String role = jwtTokenProvider.getRoleFromToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.generateToken(username, role);
-            return new JwtResponse(newAccessToken, refreshToken);
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new AppException(ErrorCode.INVALID_OR_EXPIRED_REFRESH_TOKEN);
         }
-        throw new AppException(ErrorCode.INVALID_OR_EXPIRED_REFRESH_TOKEN);
+
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        String role = jwtTokenProvider.getRoleFromToken(refreshToken);
+        String newAccessToken = jwtTokenProvider.generateToken(username, role);
+
+        // ⚠️ Không cần tạo refreshToken mới ở đây (vì vẫn còn hạn)
+        return new JwtResponse(newAccessToken, null);
     }
 
     @Transactional

@@ -1,20 +1,25 @@
 package com.carshop.oto_shop.common.exceptions;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 public class ErrorResponse {
     private String errorCode;
     private String message;
     private int status;
     private LocalDateTime timestamp;
+    private List<Map<String, String>> errors;
+
+    public ErrorResponse() {
+        this.timestamp = LocalDateTime.now();
+    }
+
     public ErrorResponse(String errorCode, String message, int status) {
         this.errorCode = errorCode;
         this.message = message;
         this.status = status;
         this.timestamp = LocalDateTime.now();
-    }
-
-    public ErrorResponse() {
     }
 
     public String getErrorCode() {
@@ -47,5 +52,13 @@ public class ErrorResponse {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public List<Map<String, String>> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<Map<String, String>> errors) {
+        this.errors = errors;
     }
 }

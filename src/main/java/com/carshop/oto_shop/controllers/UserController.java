@@ -41,11 +41,11 @@ public class UserController {
                       "Creates both Account and User records. Supports avatar upload."
     )
     @PostMapping(value = "/create-with-account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<UserResponse>> createUserWithAccount(
+    public ResponseEntity<ApiResponse<Void>> createUserWithAccount(
             @Valid @ModelAttribute UserAccountRequest request) {
         UserResponse response = userService.createUserWithAccount(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Tạo tài khoản và người dùng thành công!", response));
+                .body(ApiResponse.success("Tạo tài khoản và người dùng thành công!"));
     }
 
     @Operation(summary = "Add user", description = "API create new user")
@@ -60,12 +60,14 @@ public class UserController {
         description = "API to update user and account information. Supports updating: fullName, dob, gender, phone, address, email, password, role, status. " +
                       "Password will be BCrypt hashed automatically."
     )
-    @PutMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+
+    @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Void>> updateUser(
             @PathVariable("userId") String userId,
-            @Valid @RequestBody UserUpdateRequest request) {
-        UserResponse response = userService.updateUserWithAccount(request, userId);
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật người dùng thành công!", response));
+            @Valid @ModelAttribute UserUpdateRequest request
+    ) {
+        userService.updateUserWithAccount(request, userId);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật người dùng thành công!"));
     }
 
     @Operation(summary = "Delete user", description = "Api delete user")

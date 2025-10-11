@@ -85,6 +85,7 @@ public class SecurityConfig {
                         // ================== USERS ==================
                         // Public avatar
                         .requestMatchers(HttpMethod.GET, "/api/users/avatar/image/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/username/{username}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         // Admin management
                         .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole(Role.ADMIN.name())
