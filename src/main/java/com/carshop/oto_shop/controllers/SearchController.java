@@ -31,8 +31,13 @@ public class SearchController {
             @RequestParam(required = false) Integer yearFrom,
             @RequestParam(required = false) Integer yearTo
     ) {
-        // A proper implementation would pass these params to a dedicated search service method.
-        // For now, as a placeholder, we will return all cars.
-        return ResponseEntity.ok(carService.getAllCars());
+        // [SỬA LỖI]
+        // Thay vì gọi getAllCars(),
+        // hãy gọi phương thức searchCars mới và truyền tất cả tham số vào.
+        List<CarResponse> cars = carService.searchCars(
+                keyword, brand, category, color, priceMin, priceMax, yearFrom, yearTo
+        );
+
+        return ResponseEntity.ok(cars);
     }
 }

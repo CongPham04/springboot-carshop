@@ -49,6 +49,13 @@ public class CarDetailController {
         return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết xe thành công!", dataCarDetailResponses));
     }
 
+    @Operation(summary = "Get car detail by CarId", description = "API lấy thông tin chi tiết xe theo CarId")
+    @GetMapping("/car/{carId}")
+    public ResponseEntity<ApiResponse<CarDetailResponse>> getCarDetailByCarId(@PathVariable("carId") Long carId) {
+        CarDetailResponse carDetailResponse = carDetailService.getCarDetailByCarId(carId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết xe thành công!", carDetailResponse));
+    }
+
     @Operation(summary = "Get all car details", description = "API get all car details")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CarDetailResponse>>> getAllCarDetails() {

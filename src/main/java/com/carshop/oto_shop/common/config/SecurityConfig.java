@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authEntryPointJwt)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // ================== Swagger ==================
                         .requestMatchers(
                                 "/v3/api-docs/**",
@@ -85,19 +86,22 @@ public class SecurityConfig {
                         // ================== USERS ==================
                         // Public avatar
                         .requestMatchers(HttpMethod.GET, "/api/users/avatar/image/**").permitAll()
+                        //Admin + User
                         .requestMatchers(HttpMethod.GET, "/api/users/username/{username}").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         // Admin management
                         .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole(Role.ADMIN.name())
+
+
 
                         // ================== ORDERS ==================
                         // User + Admin
                         .requestMatchers(HttpMethod.POST, "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole(Role.ADMIN.name(), Role.USER.name())
                         // Admin only
-                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasRole(Role.ADMIN.name())
                         .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole(Role.ADMIN.name())
 
                         // ================== PAYMENTS ==================

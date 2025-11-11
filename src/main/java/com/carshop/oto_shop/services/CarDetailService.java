@@ -93,6 +93,18 @@ public class CarDetailService {
         return carDetailResponse;
     }
 
+    public CarDetailResponse getCarDetailByCarId(Long carId) {
+        Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new AppException(ErrorCode.CAR_NOT_FOUND));
+
+        CarDetail carDetail = carDetailRepository.findByCar_CarId(carId)
+                .orElseThrow(() -> new AppException(ErrorCode.CAR_DETAIL_NOT_FOUND));
+
+        CarDetailResponse response = carDetailMapper.toCarDetailResponse(carDetail);
+        response.setCarId(car.getCarId());
+        return response;
+    }
+
     public List<CarDetailResponse> getAllCarDetails() {
         List<CarDetail> carDetails = carDetailRepository.findAll();
         return carDetails.stream()

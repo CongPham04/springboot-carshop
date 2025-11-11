@@ -13,13 +13,18 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // FE
-//        config.setAllowedOrigins(List.of("https://9038c373e7b4.ngrok-free.app"));
+       config.setAllowedOrigins(List.of("http://localhost:3000")); // FE
+//       config.setAllowedOrigins(List.of("http://localhost:*", "https://*.ngrok-free.app"));
+//        config.setAllowedOrigins(List.of("https://2b4d45d22d2b.ngrok-free.app"));
+        System.out.println("🌐 CORS request handled for origin: " + config.getAllowedOriginPatterns());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        // ✅ Thêm dòng này để đảm bảo expose cookies/token về FE
+        config.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
+        System.out.println("✅ CORS Config loaded successfully!");
         return source;
     }
 }
