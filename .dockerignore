@@ -1,0 +1,13 @@
+# Ignore directories
+target/
+.mvn/
+.gradle/
+.idea/
+.vscode/
+node_modules/
+
+# Ignore files
+.DS_Store
+*.log
+npm-debug.log*
+.gitignore
